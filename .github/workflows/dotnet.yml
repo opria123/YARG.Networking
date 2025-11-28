@@ -1,0 +1,39 @@
+name: .NET Build
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/dotnet.yml'
+      - 'Directory.Build.props'
+      - 'YARG.Networking.sln'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/dotnet.yml'
+      - 'Directory.Build.props'
+      - 'YARG.Networkin
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore YARG.Networking.sln
+
+      - name: Build
+        run: dotnet build YARG.Networking.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test YARG.Networking.sln --configuration Release --no-build

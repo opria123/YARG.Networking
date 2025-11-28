@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "YbZnlCjWcxM=",
+  "success": true,
+  "projectFilePath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.ServerHost\\YARG.ServerHost.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\opria\\.nuget\\packages\\litenetlib\\1.1.0\\litenetlib.1.1.0.nupkg.sha512",
+    "C:\\Users\\opria\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\opria\\.nuget\\packages\\system.text.json\\8.0.5\\system.text.json.8.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}
