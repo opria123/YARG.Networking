@@ -7,7 +7,8 @@ using YARG.Net.Transport;
 namespace YARG.Net.Runtime;
 
 /// <summary>
-/// Basic polling-based server runtime that drives an <see cref="INetTransport"/>.
+/// Default polling-based server runtime that drives an <see cref="INetTransport"/>.
+/// Supports both hosted game servers and dedicated servers.
 /// </summary>
 public sealed class DefaultServerRuntime : IServerRuntime
 {
@@ -19,11 +20,28 @@ public sealed class DefaultServerRuntime : IServerRuntime
     private Task? _loopTask;
     private bool _isRunning;
     private bool _transportEventsAttached;
+    private ServerConnectionManager? _connectionManager;
+
+    public event EventHandler<ServerPeerConnectedEventArgs>? PeerConnected;
+    public event EventHandler<ServerPeerDisconnectedEventArgs>? PeerDisconnected;
 
     public DefaultServerRuntime(TimeSpan? pollInterval = null)
     {
         _pollInterval = pollInterval ?? TimeSpan.FromMilliseconds(15);
     }
+
+    public bool IsRunning
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _isRunning;
+            }
+        }
+    }
+
+    public IServerConnectionManager? ConnectionManager => _connectionManager;
 
     public void Configure(ServerRuntimeOptions options)
     {
@@ -45,6 +63,10 @@ public sealed class DefaultServerRuntime : IServerRuntime
             }
 
             _configuredOptions = options;
+
+            // Use provided connection manager or create a new one
+            _connectionManager = options.ConnectionManager as ServerConnectionManager
+                ?? new ServerConnectionManager();
         }
     }
 
@@ -101,11 +123,17 @@ public sealed class DefaultServerRuntime : IServerRuntime
         return Task.CompletedTask;
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken = default)
+    public Task StopAsync(CancellationToken cancellationToken = default)
+    {
+        return StopAsync(null, cancellationToken);
+    }
+
+    public async Task StopAsync(string? reason = null, CancellationToken cancellationToken = default)
     {
         Task? loopTask;
         CancellationTokenSource? loopCancellation;
         INetTransport? transport = null;
+        ServerConnectionManager? connectionManager;
 
         lock (_gate)
         {
@@ -117,11 +145,15 @@ public sealed class DefaultServerRuntime : IServerRuntime
             loopTask = _loopTask;
             loopCancellation = _loopCancellation;
             transport = _configuredOptions?.Transport;
+            connectionManager = _connectionManager;
 
             _loopTask = null;
             _loopCancellation = null;
             _isRunning = false;
         }
+
+        // Disconnect all clients before stopping transport
+        connectionManager?.DisconnectAll(reason);
 
         loopCancellation?.Cancel();
 
@@ -133,8 +165,20 @@ public sealed class DefaultServerRuntime : IServerRuntime
         if (transport is not null)
         {
             DetachTransportEvents(transport);
-            transport.Shutdown();
+            transport.Shutdown(reason);
         }
+
+        loopCancellation?.Dispose();
+    }
+
+    public void Broadcast(ReadOnlySpan<byte> data, ChannelType channel = ChannelType.ReliableOrdered)
+    {
+        _connectionManager?.BroadcastToAuthenticated(data, channel);
+    }
+
+    public void BroadcastExcept(ReadOnlySpan<byte> data, Guid excludeConnectionId, ChannelType channel = ChannelType.ReliableOrdered)
+    {
+        _connectionManager?.BroadcastToAuthenticatedExcept(data, excludeConnectionId, channel);
     }
 
     private void RunLoop(INetTransport transport, CancellationToken cancellationToken)
@@ -181,6 +225,8 @@ public sealed class DefaultServerRuntime : IServerRuntime
             return;
         }
 
+        transport.OnPeerConnected += HandlePeerConnected;
+        transport.OnPeerDisconnected += HandlePeerDisconnected;
         transport.OnPayloadReceived += HandlePayloadReceived;
         _transportEventsAttached = true;
     }
@@ -192,8 +238,28 @@ public sealed class DefaultServerRuntime : IServerRuntime
             return;
         }
 
+        transport.OnPeerConnected -= HandlePeerConnected;
+        transport.OnPeerDisconnected -= HandlePeerDisconnected;
         transport.OnPayloadReceived -= HandlePayloadReceived;
         _transportEventsAttached = false;
+    }
+
+    private void HandlePeerConnected(INetConnection connection)
+    {
+        // Notify connection manager
+        _connectionManager?.OnPeerConnected(connection);
+
+        // Raise event for external listeners
+        PeerConnected?.Invoke(this, new ServerPeerConnectedEventArgs(connection));
+    }
+
+    private void HandlePeerDisconnected(INetConnection connection)
+    {
+        // Notify connection manager
+        _connectionManager?.OnPeerDisconnected(connection);
+
+        // Raise event for external listeners
+        PeerDisconnected?.Invoke(this, new ServerPeerDisconnectedEventArgs(connection));
     }
 
     private void HandlePayloadReceived(INetConnection connection, ReadOnlyMemory<byte> payload, ChannelType channel)

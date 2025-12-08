@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>11.0</LangVersion>
     <RootNamespace>YARG.Net</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>Core networking abstractions for YARG.</Description>
@@ -10,5 +11,14 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="LiteNetLib" Version="1.1.0" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <!-- PolySharp provides all necessary polyfills for C# 11 features on netstandard2.1 -->
+    <PackageReference Include="PolySharp" Version="1.14.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <!-- Exclude manual polyfill files - PolySharp provides these -->
+  <ItemGroup>
+    <Compile Remove="CompilerServices\**\*.cs" />
   </ItemGroup>
 </Project>

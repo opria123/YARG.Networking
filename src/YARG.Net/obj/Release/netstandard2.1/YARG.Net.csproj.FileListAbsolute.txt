@@ -1,0 +1,6 @@
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.csproj.AssemblyReference.cache
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.GeneratedMSBuildEditorConfig.editorconfig
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.AssemblyInfoInputs.cache
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.AssemblyInfo.cs
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.csproj.CoreCompileInputs.cache
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.sourcelink.json

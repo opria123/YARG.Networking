@@ -103,3 +103,6 @@ F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8
 F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8.0\YARG.Net.Tests.pdb
 F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8.0\YARG.Net.Tests.genruntimeconfig.cache
 F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8.0\ref\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8.0\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8.0\refint\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Debug\net8.0\YARG.Net.Tests.pdb

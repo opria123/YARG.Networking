@@ -1,0 +1,5 @@
+is_global = true
+build_property.RootNamespace = YARG.Net
+build_property.ProjectDir = F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

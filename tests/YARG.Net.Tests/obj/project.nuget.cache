@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "W2vxjGLDlnM=",
+  "dgSpecHash": "NOf0B3jcFq0=",
   "success": true,
-  "projectFilePath": "F:\\projects\\YARG-development\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj",
+  "projectFilePath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\opria\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
     "C:\\Users\\opria\\.nuget\\packages\\litenetlib\\1.1.0\\litenetlib.1.1.0.nupkg.sha512",

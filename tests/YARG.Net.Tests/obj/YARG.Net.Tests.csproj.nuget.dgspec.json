@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\projects\\YARG-development\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj": {}
+    "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj": {}
   },
   "projects": {
-    "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
+    "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
+        "projectUniqueName": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
         "projectName": "YARG.Net",
-        "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
+        "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
         "packagesPath": "C:\\Users\\opria\\.nuget\\packages\\",
-        "outputPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\obj\\",
+        "outputPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\opria\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -77,14 +77,14 @@
         }
       }
     },
-    "F:\\projects\\YARG-development\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj": {
+    "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\projects\\YARG-development\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj",
+        "projectUniqueName": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj",
         "projectName": "YARG.Net.Tests",
-        "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj",
+        "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\tests\\YARG.Net.Tests\\YARG.Net.Tests.csproj",
         "packagesPath": "C:\\Users\\opria\\.nuget\\packages\\",
-        "outputPath": "F:\\projects\\YARG-development\\YARG.Networking\\tests\\YARG.Net.Tests\\obj\\",
+        "outputPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\tests\\YARG.Net.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\opria\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -99,8 +99,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
-                "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj"
+              "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
+                "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj"
               }
             }
           }
@@ -124,6 +124,10 @@
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[17.10.0, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.5, )"
             },
             "coverlet.collector": {
               "suppressParent": "All",
