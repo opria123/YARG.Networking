@@ -103,3 +103,14 @@ F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Release\ne
 F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.pdb
 F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.genruntimeconfig.cache
 F:\projects\YARG-development\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\ref\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\refint\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.pdb
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\bin\Release\net8.0\.msCoverageSourceRootsMapping_YARG.Net.Tests
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\bin\Release\net8.0\CoverletSourceRootsMapping_YARG.Net.Tests
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.csproj.AssemblyReference.cache
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.GeneratedMSBuildEditorConfig.editorconfig
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.AssemblyInfoInputs.cache
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.AssemblyInfo.cs
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.csproj.CoreCompileInputs.cache
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.sourcelink.json

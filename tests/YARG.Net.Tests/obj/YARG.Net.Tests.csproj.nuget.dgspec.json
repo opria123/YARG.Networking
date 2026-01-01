@@ -52,6 +52,12 @@
               "target": "Package",
               "version": "[13.0.3, )"
             },
+            "PolySharp": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.14.1, )"
+            },
             "System.Text.Json": {
               "target": "Package",
               "version": "[8.0.5, )"

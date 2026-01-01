@@ -58,6 +58,36 @@
             Information about a discovered lobby.
             </summary>
         </member>
+        <member name="P:YARG.Net.Directory.DiscoveredLobbyInfo.SessionType">
+            <summary>
+            Session type: 0 = Server (persistent, bookmarkable), 1 = Lobby (ephemeral UPnP, not bookmarkable).
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.DiscoveredLobbyInfo.NoFailMode">
+            <summary>
+            Whether No Fail mode is enabled for this lobby.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.DiscoveredLobbyInfo.SharedSongsOnly">
+            <summary>
+            Whether only shared songs can be played.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.DiscoveredLobbyInfo.BandSize">
+            <summary>
+            Maximum band size (0 = unlimited).
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.DiscoveredLobbyInfo.AllowedGameModes">
+            <summary>
+            Allowed game modes for this lobby (as int values). Empty means all modes allowed.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.DiscoveredLobbyInfo.IsDedicatedServer">
+            <summary>
+            Whether this lobby is hosted by a dedicated server (no host player).
+            </summary>
+        </member>
         <member name="T:YARG.Net.Directory.LobbyPrivacy">
             <summary>
             Lobby privacy modes.
@@ -82,6 +112,11 @@
         <member name="E:YARG.Net.Directory.DiscoveryManager.LobbyDiscovered">
             <summary>
             Raised when a new lobby is discovered.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Directory.DiscoveryManager.LobbyUpdated">
+            <summary>
+            Raised when an existing lobby is updated (refreshed).
             </summary>
         </member>
         <member name="E:YARG.Net.Directory.DiscoveryManager.LobbyLost">
@@ -400,6 +435,52 @@
             Handles <see cref="T:YARG.Net.Packets.HandshakeRequestPacket"/> messages for server runtimes.
             </summary>
         </member>
+        <member name="T:YARG.Net.Handlers.Server.ServerBinaryPacketRelay">
+            <summary>
+            Handles binary packet relay for the dedicated server.
+            Binary packets use the first byte as the PacketType enum value.
+            This handler relays gameplay-related packets to other connected clients.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Handlers.Server.ServerBinaryPacketRelay._relayToOthersPacketTypes">
+            <summary>
+            Set of packet types that should be relayed to all other clients (excluding sender).
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Handlers.Server.ServerBinaryPacketRelay._broadcastToAllPacketTypes">
+            <summary>
+            Set of packet types that should be broadcast to ALL clients (including sender).
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Handlers.Server.ServerBinaryPacketRelay.PacketReceived">
+            <summary>
+            Raised when a binary packet is received that needs custom handling.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Handlers.Server.ServerBinaryPacketRelay.TryHandleBinaryPacket(YARG.Net.Transport.INetConnection,System.ReadOnlyMemory{System.Byte},YARG.Net.Transport.ChannelType)">
+            <summary>
+            Attempts to handle a binary packet. Returns true if the packet was handled.
+            </summary>
+            <param name="connection">The connection that sent the packet.</param>
+            <param name="payload">The raw packet data.</param>
+            <param name="channel">The channel the packet was received on.</param>
+            <returns>True if the packet was handled as a binary packet.</returns>
+        </member>
+        <member name="M:YARG.Net.Handlers.Server.ServerBinaryPacketRelay.RelayToOthers(YARG.Net.Transport.INetConnection,System.ReadOnlyMemory{System.Byte},YARG.Net.Transport.ChannelType)">
+            <summary>
+            Relays a packet to all connected clients except the sender.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Handlers.Server.ServerBinaryPacketRelay.BroadcastToAll(System.ReadOnlyMemory{System.Byte},YARG.Net.Transport.ChannelType)">
+            <summary>
+            Broadcasts a packet to all connected clients.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Handlers.Server.BinaryPacketReceivedEventArgs">
+            <summary>
+            Event args for binary packet received events.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Handlers.Server.ServerGameplayHandler">
             <summary>
             Handles gameplay-related packets and broadcasts state to all clients.
@@ -465,51 +546,159 @@
             Handles lobby-related commands sent by clients (ready toggles, song selection).
             </summary>
         </member>
+        <member name="T:YARG.Net.Introducer.LobbyCodeClient">
+            <summary>
+            Client for interacting with introducer lobby code endpoints.
+            Lobby codes are 6-character hex strings that allow players to easily join lobbies.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.#ctor">
+            <summary>
+            Creates a new LobbyCodeClient with the default HttpClient.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.#ctor(System.Net.Http.HttpClient)">
+            <summary>
+            Creates a new LobbyCodeClient with a shared HttpClient.
+            </summary>
+            <param name="httpClient">The HttpClient to use. Will not be disposed by this client.</param>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.RegisterLobbyAsync(System.String,System.Guid,System.String,System.String,System.String,System.Int32,System.Int32,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Registers a lobby with the introducer service.
+            This must be called before generating a code for the lobby.
+            </summary>
+            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyId">The lobby ID.</param>
+            <param name="lobbyName">The display name of the lobby.</param>
+            <param name="hostName">The host's display name.</param>
+            <param name="hostAddress">The public IP address of the host.</param>
+            <param name="hostPort">The port the host is listening on.</param>
+            <param name="maxPlayers">Maximum number of players allowed.</param>
+            <param name="hasPassword">Whether the lobby requires a password.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if registration succeeded.</returns>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.GenerateCodeAsync(System.String,System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Generates a lobby code for the specified lobby.
+            If the lobby already has a code, the existing code is returned.
+            Note: The lobby must be registered first via RegisterLobbyAsync.
+            </summary>
+            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyId">The lobby ID to generate a code for.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The generated (or existing) lobby code result.</returns>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.RegisterCodeAsync(System.String,System.String,System.Guid,System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Registers an existing lobby code with an introducer.
+            This is used to disseminate a code generated by another introducer
+            so players using different introducers can still find each other.
+            </summary>
+            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="code">The 6-character lobby code to register.</param>
+            <param name="lobbyId">The lobby ID this code maps to.</param>
+            <param name="hostAddress">The public IP address of the host.</param>
+            <param name="hostPort">The port the host is listening on.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the code was registered successfully.</returns>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.LookupCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Looks up a lobby by its code.
+            </summary>
+            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="code">The 6-character lobby code.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The lobby lookup result.</returns>
+        </member>
+        <member name="M:YARG.Net.Introducer.LobbyCodeClient.ReleaseCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Releases a lobby code.
+            </summary>
+            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="code">The 6-character lobby code to release.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if the code was released, false otherwise.</returns>
+        </member>
+        <member name="T:YARG.Net.Introducer.LobbyCodeResult">
+            <summary>
+            Result of a lobby code generation request.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Introducer.LobbyLookupResult">
+            <summary>
+            Result of a lobby code lookup request.
+            </summary>
+        </member>
         <member name="T:YARG.Net.LocalPlayerIdentity">
             <summary>
             Manages the local player's network identity, including persistence of the player ID.
+            Supports multiple local profiles, each with their own unique network identity.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.LocalPlayerIdentity._identityCache">
+            <summary>
+            Cache of identities by profile ID. Each profile gets its own unique network identity.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.LocalPlayerIdentity._defaultIdentity">
+            <summary>
+            Legacy single-identity cache for backwards compatibility when no profile ID is provided.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.LocalPlayerIdentity._sessionId">
+            <summary>
+            Unique session ID generated once per process. This ensures each ParrelSync instance
+            or separate game instance gets a unique network identity even if sharing profile folders.
+            Used only for the default identity when no profile ID is provided.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.LocalPlayerIdentity.GetOrCreate(System.String,System.Guid)">
+            <summary>
+            Gets the local player's identity for a specific profile, creating one if it doesn't exist.
+            Each profile gets a unique NetworkPlayerId that combines the session ID and profile ID,
+            ensuring uniqueness across different game instances even with the same profiles.
+            </summary>
+            <param name="displayName">The display name to use.</param>
+            <param name="profileId">The profile's unique ID.</param>
+            <returns>The network identity for this profile.</returns>
+        </member>
+        <member name="M:YARG.Net.LocalPlayerIdentity.CombineGuids(System.Guid,System.Guid)">
+            <summary>
+            Combines two GUIDs to create a new deterministic GUID.
+            Uses XOR to combine the byte arrays, ensuring the result is unique per combination.
             </summary>
         </member>
         <member name="M:YARG.Net.LocalPlayerIdentity.GetOrCreate(System.String)">
             <summary>
-            Gets the local player's identity, creating one if it doesn't exist.
+            Gets the default local player's identity (for backwards compatibility).
+            Uses the session GUID when no profile ID is available.
             </summary>
             <param name="displayName">The display name to use.</param>
             <returns>The local player's network identity.</returns>
         </member>
-        <member name="M:YARG.Net.LocalPlayerIdentity.GetOrCreate(System.String,System.Nullable{System.Guid})">
+        <member name="P:YARG.Net.LocalPlayerIdentity.SessionId">
             <summary>
-            Gets the local player's identity with a persisted player ID.
-            </summary>
-            <param name="displayName">The display name to use.</param>
-            <param name="persistedPlayerId">The persisted player ID to use if available.</param>
-            <returns>The local player's network identity.</returns>
-        </member>
-        <member name="P:YARG.Net.LocalPlayerIdentity.Current">
-            <summary>
-            Gets the currently cached identity, if any.
-            </summary>
-        </member>
-        <member name="P:YARG.Net.LocalPlayerIdentity.PlayerId">
-            <summary>
-            Gets the player ID from the current identity, or null if not set.
+            Gets the session-unique ID for this process instance.
             </summary>
         </member>
         <member name="P:YARG.Net.LocalPlayerIdentity.DisplayName">
             <summary>
-            Gets the display name from the current identity, or null if not set.
+            Gets the display name from the default identity, or null if not set.
             </summary>
         </member>
         <member name="M:YARG.Net.LocalPlayerIdentity.UpdateDisplayName(System.String)">
             <summary>
-            Updates the display name of the current identity.
+            Updates the display name of the default identity.
             </summary>
             <param name="newDisplayName">The new display name.</param>
             <returns>True if the identity was updated, false if no identity exists.</returns>
         </member>
         <member name="M:YARG.Net.LocalPlayerIdentity.Clear">
             <summary>
-            Clears the cached identity. Used for testing or when logging out.
+            Clears all cached identities. Used for testing or when logging out.
             </summary>
         </member>
         <member name="M:YARG.Net.LocalPlayerIdentity.GenerateRandomDisplayName">
@@ -621,25 +810,65 @@
             Binary packet builder/parser for authentication-related messages.
             </summary>
         </member>
-        <member name="M:YARG.Net.Packets.AuthBinaryPackets.BuildRequestPacket(System.String)">
+        <member name="M:YARG.Net.Packets.AuthBinaryPackets.BuildRequestPacket(System.String,System.Int32,System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity})">
             <summary>
-            Builds an auth request packet with password.
+            Builds an auth request packet with password, profile count, and optional player identities.
             </summary>
+            <param name="password">The lobby password.</param>
+            <param name="profileCount">The number of local profiles the client wants to join with.</param>
+            <param name="playerIdentities">Optional list of player identities to include (for combined auth+handshake).</param>
         </member>
-        <member name="M:YARG.Net.Packets.AuthBinaryPackets.BuildResponsePacket(System.Boolean)">
+        <member name="M:YARG.Net.Packets.AuthBinaryPackets.BuildResponsePacket(System.Boolean,System.String)">
             <summary>
             Builds an auth response packet.
             </summary>
         </member>
-        <member name="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@)">
+        <member name="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@,System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity}@)">
             <summary>
-            Parses an auth request packet.
+            Parses an auth request packet with optional player identities.
+            </summary>
+            <param name="data">The packet data.</param>
+            <param name="password">The parsed password.</param>
+            <param name="profileCount">The number of profiles the client wants to join with.</param>
+            <param name="playerIdentities">The player identities if included.</param>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@)">
+            <summary>
+            Parses an auth request packet (backwards compatible overload).
             </summary>
         </member>
-        <member name="M:YARG.Net.Packets.AuthBinaryPackets.TryParseResponsePacket(System.ReadOnlySpan{System.Byte},System.Boolean@)">
+        <member name="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@)">
+            <summary>
+            Parses an auth request packet (backwards compatible overload).
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthBinaryPackets.TryParseResponsePacket(System.ReadOnlySpan{System.Byte},System.Boolean@,System.String@)">
             <summary>
             Parses an auth response packet.
             </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.AuthenticationBinaryPackets">
+            <summary>
+            Alias for <see cref="T:YARG.Net.Packets.AuthBinaryPackets"/> for compatibility.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthenticationBinaryPackets.BuildRequestPacket(System.String,System.Int32,System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity})">
+            <inheritdoc cref="M:YARG.Net.Packets.AuthBinaryPackets.BuildRequestPacket(System.String,System.Int32,System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity})"/>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthenticationBinaryPackets.BuildResponsePacket(System.Boolean,System.String)">
+            <inheritdoc cref="M:YARG.Net.Packets.AuthBinaryPackets.BuildResponsePacket(System.Boolean,System.String)"/>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthenticationBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@,System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity}@)">
+            <inheritdoc cref="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@,System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity}@)"/>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthenticationBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@)">
+            <inheritdoc cref="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@)"/>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthenticationBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@)">
+            <inheritdoc cref="M:YARG.Net.Packets.AuthBinaryPackets.TryParseRequestPacket(System.ReadOnlySpan{System.Byte},System.String@)"/>
+        </member>
+        <member name="M:YARG.Net.Packets.AuthenticationBinaryPackets.TryParseResponsePacket(System.ReadOnlySpan{System.Byte},System.Boolean@,System.String@)">
+            <inheritdoc cref="M:YARG.Net.Packets.AuthBinaryPackets.TryParseResponsePacket(System.ReadOnlySpan{System.Byte},System.Boolean@,System.String@)"/>
         </member>
         <member name="T:YARG.Net.Packets.Dispatch.PacketDispatcher">
             <summary>
@@ -723,6 +952,23 @@
             Builds a player left gameplay packet.
             </summary>
         </member>
+        <member name="M:YARG.Net.Packets.GameplayBinaryPackets.BuildGameplayLoadReadyPacket(System.String)">
+            <summary>
+            Builds a gameplay load ready packet.
+            Sent by clients to signal they have finished loading the song.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.GameplayBinaryPackets.TryParseGameplayLoadReadyPacket(System.ReadOnlySpan{System.Byte},System.String@)">
+            <summary>
+            Parses a gameplay load ready packet.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.GameplayBinaryPackets.BuildGameplayAllLoadReadyPacket">
+            <summary>
+            Builds a gameplay all load ready packet.
+            Sent by host to all clients when everyone has finished loading.
+            </summary>
+        </member>
         <member name="M:YARG.Net.Packets.GameplayBinaryPackets.TryParsePlayerLeftPacket(System.ReadOnlySpan{System.Byte},System.String@)">
             <summary>
             Parses a player left gameplay packet.
@@ -741,6 +987,51 @@
         <member name="M:YARG.Net.Packets.GameplayBinaryPackets.TryParseSnapshotPacket(System.ReadOnlySpan{System.Byte},YARG.Net.Packets.GameplayBinaryPackets.SnapshotData@)">
             <summary>
             Parses a gameplay snapshot packet.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.GameplaySnapshot">
+            <summary>
+            Represents a gameplay state snapshot for network synchronization.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Packets.GameplaySnapshot.Happiness">
+            <summary>
+            Player's current happiness/rock meter value (0.0 to 1.0).
+            Synced from the player's local client which is the source of truth.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Packets.GameplaySnapshot.HasFailed">
+            <summary>
+            Whether the player has failed (happiness dropped to 0).
+            Synced from the player's local client which is the source of truth.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.GameplayStateBinaryPackets">
+            <summary>
+            Binary packet builder/parser for gameplay state synchronization.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.GameplayStateBinaryPackets.MinPacketSize">
+            <summary>
+            Minimum packet size without player name.
+            1 (type) + 4 (seq) + 4*3 (score/combo/streak) + 1+4+4+4 (SP) + 4*2 (notes) + 
+            4*4 (guitar) + 4*3 (drums) + 4 (band) + 4*2+4+4 (vocals) + 1+4*6 (solo) + 4+4 (sustain/whammy) + 4 (stars) + 8 (time) + 2 (nameLen) + 4+1 (happiness/failed)
+            = 1 + 4 + 12 + 13 + 8 + 16 + 12 + 4 + 16 + 25 + 8 + 4 + 8 + 2 + 5 = 138
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.GameplayStateBinaryPackets.BuildSnapshotPacket(YARG.Net.Packets.GameplaySnapshot@)">
+            <summary>
+            Builds a gameplay state snapshot packet.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.GameplayStateBinaryPackets.ParsedSnapshot">
+            <summary>
+            Parsed gameplay snapshot data.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.GameplayStateBinaryPackets.ParseSnapshotPacket(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Parses a gameplay state snapshot packet.
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.HandshakeBinaryPackets">
@@ -779,9 +1070,187 @@
             Parses a handshake response packet.
             </summary>
         </member>
+        <member name="M:YARG.Net.Packets.HandshakeBinaryPackets.BuildMultiPlayerRequestPacket(System.Collections.Generic.IReadOnlyList{YARG.Net.NetworkPlayerIdentity})">
+            <summary>
+            Builds a handshake request packet with multiple player identities.
+            Used when a client has multiple local profiles to register with the lobby.
+            </summary>
+            <param name="identities">The list of player identities to send.</param>
+        </member>
+        <member name="M:YARG.Net.Packets.HandshakeBinaryPackets.TryParseMultiPlayerRequestPacket(System.ReadOnlySpan{System.Byte},System.Collections.Generic.List{YARG.Net.NetworkPlayerIdentity}@)">
+            <summary>
+            Parses a handshake request packet that may contain multiple player identities.
+            Returns the list of identities if successful.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Packets.IPacketPayload">
             <summary>
             Marker interface implemented by all packet payload DTOs.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.SessionPhase">
+            <summary>
+            Represents the current phase of a multiplayer session.
+            Used for late join handling to determine what state new joiners should enter.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.SessionPhase.Lobby">
+            <summary>
+            In the lobby/music library - not a late join.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.SessionPhase.MusicLibrary">
+            <summary>
+            In music library selecting songs - not a late join.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.SessionPhase.DifficultySelect">
+            <summary>
+            In difficulty selection for a setlist song.
+            Late joiners need to have the current/remaining setlist songs.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.SessionPhase.Countdown">
+            <summary>
+            Countdown before song starts.
+            Late joiners need to have the current song.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.SessionPhase.PlayingSong">
+            <summary>
+            Song is currently being played.
+            Late joiners with the song can spectate, without must wait.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.SessionPhase.ScoreScreen">
+            <summary>
+            On the score screen after a song.
+            Treated similar to DifficultySelect for late join purposes.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.LateJoinAction">
+            <summary>
+            Late joiner status - what action they should take.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.LateJoinAction.NormalJoin">
+            <summary>
+            Not a late join - normal join flow.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.LateJoinAction.SpectateCurrentSong">
+            <summary>
+            Late joiner can spectate the current song, will join next song.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.LateJoinAction.WaitForSongEnd">
+            <summary>
+            Late joiner doesn't have the current song - must wait.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.LateJoinAction.AbortSetlist">
+            <summary>
+            Late joiner doesn't have remaining setlist songs - abort setlist for everyone.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.LateJoinAction.JoinDifficultySelect">
+            <summary>
+            Late join during diff select with all songs - immediate join.
+            </summary>
+        </member>
+        <member name="F:YARG.Net.Packets.LateJoinAction.Rejected">
+            <summary>
+            Late join rejected - host has disabled late joining.
+            Client should show message and disconnect cleanly.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.LateJoinStatePacket">
+            <summary>
+            Sent by host to a late-joining client to describe the current session state.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinStatePacket.#ctor(System.Guid,YARG.Net.Packets.SessionPhase,System.String,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+            Sent by host to a late-joining client to describe the current session state.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.LateJoinSongCheckResponsePacket">
+            <summary>
+            Sent by client to host in response to LateJoinState, indicating which songs they have.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinSongCheckResponsePacket.#ctor(System.Guid,System.Boolean,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+            Sent by client to host in response to LateJoinState, indicating which songs they have.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.LateJoinActionPacket">
+            <summary>
+            Sent by host to late-joining client (and optionally all clients) with the late join decision.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinActionPacket.#ctor(System.Guid,System.Guid,System.String,YARG.Net.Packets.LateJoinAction,System.String,System.Double)">
+            <summary>
+            Sent by host to late-joining client (and optionally all clients) with the late join decision.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.SetlistAbortPacket">
+            <summary>
+            Sent by host to all clients when the setlist must be aborted due to a late joiner.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SetlistAbortPacket.#ctor(System.Guid,System.String)">
+            <summary>
+            Sent by host to all clients when the setlist must be aborted due to a late joiner.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.LateJoinBinaryPackets">
+            <summary>
+            Binary packet builder/parser for late join messages.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.BuildLateJoinStatePacket(YARG.Net.Packets.SessionPhase,System.String,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+            Builds a late join state packet.
+            Format: [PacketType (1)][Phase (1)][CurrentSongHashLen (2)][CurrentSongHash][SetlistCount (2)][SetlistHashes...]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.TryParseLateJoinStatePacket(System.ReadOnlySpan{System.Byte},YARG.Net.Packets.SessionPhase@,System.String@,System.Collections.Generic.List{System.String}@)">
+            <summary>
+            Parses a late join state packet.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.BuildSongCheckResponsePacket(System.Guid,System.Boolean,System.Collections.Generic.IReadOnlyList{System.String})">
+            <summary>
+            Builds a late join song check response packet.
+            Format: [PacketType (1)][PlayerId (16)][HasCurrentSong (1)][OwnedCount (2)][OwnedHashes...]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.TryParseSongCheckResponsePacket(System.ReadOnlySpan{System.Byte},System.Guid@,System.Boolean@,System.Collections.Generic.List{System.String}@)">
+            <summary>
+            Parses a late join song check response packet.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.BuildLateJoinActionPacket(System.Guid,System.String,YARG.Net.Packets.LateJoinAction,System.String,System.Double)">
+            <summary>
+            Builds a late join action packet.
+            Format: [PacketType (1)][PlayerId (16)][Action (1)][SongTime (8)][PlayerNameLen (2)][PlayerName][MessageLen (2)][Message]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.TryParseLateJoinActionPacket(System.ReadOnlySpan{System.Byte},System.Guid@,System.String@,YARG.Net.Packets.LateJoinAction@,System.String@,System.Double@)">
+            <summary>
+            Parses a late join action packet.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.BuildSetlistAbortPacket(System.String)">
+            <summary>
+            Builds a setlist abort packet.
+            Format: [PacketType (1)][ReasonLen (2)][Reason]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.LateJoinBinaryPackets.TryParseSetlistAbortPacket(System.ReadOnlySpan{System.Byte},System.String@)">
+            <summary>
+            Parses a setlist abort packet.
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.ReadyStateBinaryPackets">
@@ -791,7 +1260,19 @@
         </member>
         <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.BuildReadyStatePacket(System.String,System.Boolean)">
             <summary>
-            Builds a ready state packet.
+            Builds a ready state packet (legacy format without instrument/difficulty).
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.BuildClientReadyPacket(System.String,System.Boolean,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Builds a client ready state packet with instrument, difficulty, and sitting out state.
+            Format: [PacketType (1)][isReady (1)][nameLen (2)][name][instrument (1)][difficulty (1)][sittingOut (1)]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.BuildHostBroadcastPacket(System.String,System.Boolean,System.Boolean,System.Int32,System.Int32,System.Boolean,System.Guid)">
+            <summary>
+            Builds a host broadcast ready state packet with isLocalPlayer flag, instrument/difficulty, sitting out state, and NetworkPlayerId.
+            Format: [PacketType (1)][isReady (1)][nameLen (2)][name][isLocalPlayer (1)][instrument (1)][difficulty (1)][sittingOut (1)][networkPlayerId (16)]
             </summary>
         </member>
         <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.BuildAllPlayersReadyPacket">
@@ -801,12 +1282,32 @@
         </member>
         <member name="T:YARG.Net.Packets.ReadyStateBinaryPackets.ParsedReadyState">
             <summary>
-            Parsed ready state data.
+            Parsed ready state data (legacy format).
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.ReadyStateBinaryPackets.ParsedClientReadyState">
+            <summary>
+            Parsed client ready state data with instrument/difficulty and sitting out state.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.ReadyStateBinaryPackets.ParsedHostBroadcast">
+            <summary>
+            Parsed host broadcast ready state data with sitting out state and NetworkPlayerId.
             </summary>
         </member>
         <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.TryParseReadyStatePacket(System.ReadOnlySpan{System.Byte},YARG.Net.Packets.ReadyStateBinaryPackets.ParsedReadyState@)">
             <summary>
-            Parses a ready state packet.
+            Parses a ready state packet (legacy format).
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.ParseClientReadyPacket(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Parses a client ready state packet with instrument/difficulty and sitting out state.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.ReadyStateBinaryPackets.ParseHostBroadcastPacket(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Parses a host broadcast ready state packet with sitting out state and NetworkPlayerId.
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.NavigateToMenuPacket">
@@ -884,6 +1385,11 @@
             Difficulty selection screen.
             </summary>
         </member>
+        <member name="F:YARG.Net.Packets.MenuTarget.PopMenu">
+            <summary>
+            Pop the current menu (go back one level).
+            </summary>
+        </member>
         <member name="T:YARG.Net.Packets.NavigationBinaryPackets">
             <summary>
             Binary packet builder/parser for navigation-related messages.
@@ -897,6 +1403,17 @@
         <member name="M:YARG.Net.Packets.NavigationBinaryPackets.TryParseNavigatePacket(System.ReadOnlySpan{System.Byte},YARG.Net.Packets.MenuTarget@)">
             <summary>
             Parses a navigate to menu packet.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.NavigationBinaryPackets.BuildNavigationRequestPacket(YARG.Net.Packets.MenuTarget)">
+            <summary>
+            Builds a navigation request packet (client -> server).
+            Used by designated host on dedicated servers to request navigation.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.NavigationBinaryPackets.TryParseNavigationRequestPacket(System.ReadOnlySpan{System.Byte},YARG.Net.Packets.MenuTarget@)">
+            <summary>
+            Parses a navigation request packet.
             </summary>
         </member>
         <member name="M:YARG.Net.Packets.NavigationBinaryPackets.BuildHostDisconnectPacket">
@@ -1156,6 +1673,41 @@
             Checks if there are at least the specified number of bytes remaining.
             </summary>
         </member>
+        <member name="T:YARG.Net.Packets.PlayerPresetSyncPacket">
+            <summary>
+            Sent by clients to host with their visual preset data for syncing.
+            Also used by host to broadcast preset data to all clients.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.PlayerPresetSyncPacket.#ctor(System.Guid,System.Guid,System.String,System.Guid,System.String,System.Guid,System.String,System.Guid,System.String)">
+            <summary>
+            Sent by clients to host with their visual preset data for syncing.
+            Also used by host to broadcast preset data to all clients.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.PlayerPresetBinaryPackets">
+            <summary>
+            Binary packet builder/parser for player preset sync messages.
+            Used when EnablePresetSync is enabled to sync visual presets between players.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.PlayerPresetBinaryPackets.BuildPresetSyncPacket(System.Guid,System.Guid,System.String,System.Guid,System.String,System.Guid,System.String,System.Guid,System.String)">
+            <summary>
+            Builds a player preset sync packet.
+            Format: [PacketType (1)][PlayerId (16)][CameraId (16)][HighwayId (16)][ColorId (16)][ThemeId (16)]
+                    [CameraJsonLen (4)][CameraJson][HighwayJsonLen (4)][HighwayJson][ColorJsonLen (4)][ColorJson][ThemeJsonLen (4)][ThemeJson]
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.PlayerPresetBinaryPackets.ParsedPresetSync">
+            <summary>
+            Parsed player preset sync data.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.PlayerPresetBinaryPackets.ParsePresetSyncPacket(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Parses a player preset sync packet.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Packets.ProtocolVersion">
             <summary>
             Central place to bump protocol compatibility between client/server builds.
@@ -1221,6 +1773,11 @@
             Builds a score screen advance packet.
             </summary>
         </member>
+        <member name="M:YARG.Net.Packets.ScoreBinaryPackets.BuildAdvanceRequestPacket">
+            <summary>
+            Builds a score screen advance request packet (for designated host on dedicated server).
+            </summary>
+        </member>
         <member name="M:YARG.Net.Packets.ScoreBinaryPackets.BuildResultsPacket(System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean)">
             <summary>
             Builds a score results packet.
@@ -1239,6 +1796,34 @@
         <member name="M:YARG.Net.Packets.ScoreBinaryPackets.TryParseResultsPacket(System.ReadOnlySpan{System.Byte},YARG.Net.Packets.ScoreBinaryPackets.ParsedScoreResults@)">
             <summary>
             Parses a score results packet.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.SessionSettingsSyncPacket">
+            <summary>
+            Sent by the host to synchronize session settings to all clients.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SessionSettingsSyncPacket.#ctor(System.String,System.Int32,System.Byte,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Collections.Generic.List{System.Int32},System.Boolean)">
+            <summary>
+            Sent by the host to synchronize session settings to all clients.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.SessionSettingsBinaryPackets">
+            <summary>
+            Binary packet builder/parser for session settings messages.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SessionSettingsBinaryPackets.BuildSessionSettingsSyncPacket(System.String,System.Int32,System.Byte,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Collections.Generic.List{System.Int32},System.Boolean)">
+            <summary>
+            Builds a session settings sync packet.
+            Format: [PacketType][LobbyNameLength(2)][LobbyName][MaxPlayers(4)][PrivacyMode(1)]
+                    [BandSize(4)][Flags(1)][GameModeCount(1)][GameModes...]
+            Flags: bit0=NoFail, bit1=SharedSongs, bit2=AllowMods, bit3=PresetSync, bit4=LateJoin, bit5=LocalPlayersFirst
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SessionSettingsBinaryPackets.TryParseSessionSettingsSyncPacket(System.ReadOnlySpan{System.Byte},System.String@,System.Int32@,System.Byte@,System.Int32@,System.Boolean@,System.Boolean@,System.Boolean@,System.Boolean@,System.Boolean@,System.Collections.Generic.List{System.Int32}@,System.Boolean@)">
+            <summary>
+            Parses a session settings sync packet.
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.SetlistAddPacket">
@@ -1316,6 +1901,11 @@
             Builds a setlist start packet.
             </summary>
         </member>
+        <member name="M:YARG.Net.Packets.SetlistBinaryPackets.BuildStartRequestPacket">
+            <summary>
+            Builds a setlist start request packet (from designated host to server).
+            </summary>
+        </member>
         <member name="T:YARG.Net.Packets.SetlistBinaryPackets.ParsedEntry">
             <summary>
             Parsed setlist entry data.
@@ -1368,41 +1958,85 @@
             Sent by the server to clear the shared songs list (e.g., when a player disconnects).
             </summary>
         </member>
+        <member name="T:YARG.Net.Packets.SongLibraryBinaryPackets">
+            <summary>
+            Binary packet builder/parser for song library chunk messages.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SongLibraryBinaryPackets.BuildSongLibraryChunkPacket(System.Byte[],System.Boolean,System.Boolean)">
+            <summary>
+            Builds a SongLibraryChunk packet.
+            Format: [PacketType (1)][isFirstChunk (1)][isFinalChunk (1)][dataLen (2)][hashData]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SongLibraryBinaryPackets.BuildSharedSongsChunkPacket(System.Byte[],System.Boolean,System.Boolean)">
+            <summary>
+            Builds a SharedSongsChunk packet.
+            Format: [PacketType (1)][isFirstChunk (1)][isFinalChunk (1)][dataLen (2)][hashData]
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SongLibraryBinaryPackets.BuildClearSharedSongsPacket">
+            <summary>
+            Builds a ClearSharedSongs packet.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Packets.SongLibraryBinaryPackets.ParsedChunk">
+            <summary>
+            Parsed song library chunk data.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.SongLibraryBinaryPackets.ParseChunkHeader(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Parses a song library or shared songs chunk header.
+            Data starts at DataOffset in the original span.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Packets.UnisonPhraseHitPacket">
             <summary>
             Sent by a player when they successfully complete a unison star power phrase.
             </summary>
         </member>
-        <member name="M:YARG.Net.Packets.UnisonPhraseHitPacket.#ctor(System.Guid,System.String,System.Double,System.Double)">
+        <member name="M:YARG.Net.Packets.UnisonPhraseHitPacket.#ctor(System.Guid,System.String,System.Int32,System.Double,System.Double)">
             <summary>
             Sent by a player when they successfully complete a unison star power phrase.
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.UnisonBonusAwardPacket">
             <summary>
-            Sent by the host when all players have completed a unison phrase
+            Sent by the host when all players in a band have completed a unison phrase
             and the bonus should be awarded.
             </summary>
         </member>
-        <member name="M:YARG.Net.Packets.UnisonBonusAwardPacket.#ctor(System.Guid,System.Double)">
+        <member name="M:YARG.Net.Packets.UnisonBonusAwardPacket.#ctor(System.Guid,System.Int32,System.Double)">
             <summary>
-            Sent by the host when all players have completed a unison phrase
+            Sent by the host when all players in a band have completed a unison phrase
             and the bonus should be awarded.
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.UnisonBinaryPackets">
             <summary>
             Binary packet builder/parser for unison-related messages.
+            Supports per-band unison tracking.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.UnisonBinaryPackets.BuildPhraseHitPacket(System.String,System.Int32,System.Double,System.Double)">
+            <summary>
+            Builds a unison phrase hit packet with band ID.
             </summary>
         </member>
         <member name="M:YARG.Net.Packets.UnisonBinaryPackets.BuildPhraseHitPacket(System.String,System.Double,System.Double)">
             <summary>
-            Builds a unison phrase hit packet.
+            Builds a unison phrase hit packet (legacy, bandId=0).
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Packets.UnisonBinaryPackets.BuildBonusAwardPacket(System.Int32,System.Double)">
+            <summary>
+            Builds a unison bonus award packet with band ID.
             </summary>
         </member>
         <member name="M:YARG.Net.Packets.UnisonBinaryPackets.BuildBonusAwardPacket(System.Double)">
             <summary>
-            Builds a unison bonus award packet.
+            Builds a unison bonus award packet (legacy, bandId=0).
             </summary>
         </member>
         <member name="T:YARG.Net.Packets.UnisonBinaryPackets.ParsedPhraseHit">
@@ -1415,9 +2049,14 @@
             Parses a unison phrase hit packet.
             </summary>
         </member>
+        <member name="M:YARG.Net.Packets.UnisonBinaryPackets.TryParseBonusAwardPacket(System.ReadOnlySpan{System.Byte},System.Int32@,System.Double@)">
+            <summary>
+            Parses a unison bonus award packet with band ID.
+            </summary>
+        </member>
         <member name="M:YARG.Net.Packets.UnisonBinaryPackets.TryParseBonusAwardPacket(System.ReadOnlySpan{System.Byte},System.Double@)">
             <summary>
-            Parses a unison bonus award packet.
+            Parses a unison bonus award packet (legacy overload, ignores bandId).
             </summary>
         </member>
         <member name="T:YARG.Net.Runtime.ClientNetworkingBootstrapper">
@@ -1715,6 +2354,12 @@
             Optional connection manager. If not provided, a default one will be created.
             </summary>
         </member>
+        <member name="P:YARG.Net.Runtime.ServerRuntimeOptions.BinaryPacketRelay">
+            <summary>
+            Optional binary packet relay handler for handling gameplay snapshots and other binary packets.
+            If provided, binary packets will be checked first before JSON dispatch.
+            </summary>
+        </member>
         <member name="P:YARG.Net.Runtime.ServerRuntimeOptions.IsDedicatedServer">
             <summary>
             Whether this is a dedicated server (no local host player).
@@ -1777,7 +2422,7 @@
             Supports both hosted game servers and dedicated servers.
             </summary>
         </member>
-        <member name="M:YARG.Net.Runtime.ServerNetworkingBootstrapper.InitializeHostedServer(YARG.Net.Transport.INetTransport,YARG.Net.Serialization.INetSerializer,System.Int32,System.Int32,System.Nullable{System.TimeSpan})">
+        <member name="M:YARG.Net.Runtime.ServerNetworkingBootstrapper.InitializeHostedServer(YARG.Net.Transport.INetTransport,YARG.Net.Serialization.INetSerializer,System.Int32,System.Int32,System.Nullable{System.TimeSpan},System.String)">
             <summary>
             Initializes a server networking stack for a hosted game server (host is also a player).
             </summary>
@@ -1786,9 +2431,10 @@
             <param name="port">The port to listen on.</param>
             <param name="maxPlayers">Maximum number of players allowed.</param>
             <param name="pollInterval">Optional polling interval.</param>
+            <param name="password">Optional lobby password.</param>
             <returns>A configured server networking instance.</returns>
         </member>
-        <member name="M:YARG.Net.Runtime.ServerNetworkingBootstrapper.InitializeDedicatedServer(YARG.Net.Transport.INetTransport,YARG.Net.Serialization.INetSerializer,System.Int32,System.Int32,System.Nullable{System.TimeSpan})">
+        <member name="M:YARG.Net.Runtime.ServerNetworkingBootstrapper.InitializeDedicatedServer(YARG.Net.Transport.INetTransport,YARG.Net.Serialization.INetSerializer,System.Int32,System.Int32,System.Nullable{System.TimeSpan},System.String)">
             <summary>
             Initializes a server networking stack for a dedicated server (no local host player).
             </summary>
@@ -1797,9 +2443,10 @@
             <param name="port">The port to listen on.</param>
             <param name="maxPlayers">Maximum number of players allowed.</param>
             <param name="pollInterval">Optional polling interval.</param>
+            <param name="password">Optional lobby password.</param>
             <returns>A configured server networking instance.</returns>
         </member>
-        <member name="M:YARG.Net.Runtime.ServerNetworkingBootstrapper.Initialize(YARG.Net.Transport.INetTransport,YARG.Net.Serialization.INetSerializer,System.Int32,System.Int32,System.Boolean,System.Nullable{System.TimeSpan})">
+        <member name="M:YARG.Net.Runtime.ServerNetworkingBootstrapper.Initialize(YARG.Net.Transport.INetTransport,YARG.Net.Serialization.INetSerializer,System.Int32,System.Int32,System.Boolean,System.Nullable{System.TimeSpan},System.String)">
             <summary>
             Initializes a server networking stack with full configuration options.
             </summary>
@@ -1809,11 +2456,17 @@
             <param name="maxPlayers">Maximum number of players allowed.</param>
             <param name="isDedicatedServer">Whether this is a dedicated server.</param>
             <param name="pollInterval">Optional polling interval.</param>
+            <param name="password">Optional lobby password.</param>
             <returns>A configured server networking instance.</returns>
         </member>
         <member name="T:YARG.Net.Runtime.ServerNetworkingServer">
             <summary>
             Encapsulates all server networking components.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Runtime.ServerNetworkingServer.#ctor(YARG.Net.Runtime.IServerRuntime,YARG.Net.Packets.Dispatch.IPacketDispatcher,YARG.Net.Runtime.IServerConnectionManager,System.Boolean,System.Int32,YARG.Net.Sessions.SessionManager,YARG.Net.Handlers.ServerHandshakeHandler)">
+            <summary>
+            Creates a server networking instance with full configuration.
             </summary>
         </member>
         <member name="P:YARG.Net.Runtime.ServerNetworkingServer.Runtime">
@@ -1839,6 +2492,16 @@
         <member name="P:YARG.Net.Runtime.ServerNetworkingServer.MaxPlayers">
             <summary>
             Maximum number of players allowed.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Runtime.ServerNetworkingServer.SessionManager">
+            <summary>
+            The session manager for player sessions.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Runtime.ServerNetworkingServer.HandshakeHandler">
+            <summary>
+            The handshake handler for authentication.
             </summary>
         </member>
         <member name="P:YARG.Net.Runtime.ServerNetworkingServer.CurrentPlayerCount">
@@ -2054,6 +2717,15 @@
             <summary>
             Checks if a connection is already authenticated.
             </summary>
+        </member>
+        <member name="M:YARG.Net.Sessions.LobbyAuthenticator.Validate(System.String,System.String@)">
+            <summary>
+            Validates a password without tracking connection state.
+            Useful when connection GUID is not available.
+            </summary>
+            <param name="password">The password to validate.</param>
+            <param name="resultMessage">Output message describing the result.</param>
+            <returns>True if the password is valid (or no password is required).</returns>
         </member>
         <member name="M:YARG.Net.Sessions.LobbyAuthenticator.ProcessAuthRequest(System.Guid,System.String)">
             <summary>
@@ -2587,9 +3259,9 @@
         </member>
         <member name="T:YARG.Net.Sessions.UnisonCoordinator">
             <summary>
-            Coordinates unison star power phrases across all players.
-            Tracks which players have completed each phrase and awards bonuses when all complete.
-            Server-authoritative - only the host/server runs this.
+            Coordinates unison star power phrases across all players, per-band.
+            Tracks which players have completed each phrase and awards bonuses when all players
+            in the same band complete the phrase. Server-authoritative - only the host/server runs this.
             </summary>
         </member>
         <member name="F:YARG.Net.Sessions.UnisonCoordinator.PhraseTolerance">
@@ -2600,26 +3272,64 @@
         </member>
         <member name="P:YARG.Net.Sessions.UnisonCoordinator.ExpectedPlayerCount">
             <summary>
-            Gets or sets the expected number of players for unison completion.
+            Gets or sets the expected number of players for unison completion (legacy global).
+            For per-band tracking, use SetBandPlayerCount instead.
             </summary>
+        </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.SetBandPlayerCount(System.Int32,System.Int32)">
+            <summary>
+            Sets the expected player count for a specific band.
+            </summary>
+            <param name="bandId">The band ID.</param>
+            <param name="playerCount">The number of players in this band.</param>
+        </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.GetBandPlayerCount(System.Int32)">
+            <summary>
+            Gets the expected player count for a specific band.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.ClearBandPlayerCounts">
+            <summary>
+            Clears all band player counts.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.RecordPhraseHit(System.String,System.Int32,System.Double,System.Double)">
+            <summary>
+            Records that a player has completed a unison phrase (per-band).
+            </summary>
+            <param name="playerKey">Unique identifier for the player (connection ID or name).</param>
+            <param name="bandId">The band the player belongs to.</param>
+            <param name="phraseTime">The time of the unison phrase.</param>
+            <param name="phraseEndTime">The end time of the unison phrase (used for matching).</param>
+            <returns>True if this completion triggered a bonus award, false otherwise.</returns>
         </member>
         <member name="M:YARG.Net.Sessions.UnisonCoordinator.RecordPhraseHit(System.String,System.Double,System.Double)">
             <summary>
-            Records that a player has completed a unison phrase.
+            Records that a player has completed a unison phrase (legacy global, bandId=0).
             </summary>
             <param name="playerKey">Unique identifier for the player (connection ID or name).</param>
             <param name="phraseTime">The time of the unison phrase.</param>
             <param name="phraseEndTime">The end time of the unison phrase (used for matching).</param>
             <returns>True if this completion triggered a bonus award, false otherwise.</returns>
         </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.GetPhraseStatus(System.Int32,System.Double)">
+            <summary>
+            Gets completion info for a phrase in a specific band (for debugging/UI).
+            </summary>
+        </member>
         <member name="M:YARG.Net.Sessions.UnisonCoordinator.GetPhraseStatus(System.Double)">
             <summary>
-            Gets completion info for a phrase (for debugging/UI).
+            Gets completion info for a phrase (legacy global, bandId=0).
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.WasAwarded(System.Int32,System.Double)">
+            <summary>
+            Checks if a phrase has already been awarded for a specific band.
             </summary>
         </member>
         <member name="M:YARG.Net.Sessions.UnisonCoordinator.WasAwarded(System.Double)">
             <summary>
-            Checks if a phrase has already been awarded.
+            Checks if a phrase has already been awarded (legacy global, bandId=0).
             </summary>
         </member>
         <member name="M:YARG.Net.Sessions.UnisonCoordinator.Reset">
@@ -2627,9 +3337,14 @@
             Resets all tracking state. Call when starting a new song.
             </summary>
         </member>
-        <member name="M:YARG.Net.Sessions.UnisonCoordinator.BuildAwardPacket(System.Guid,System.Double)">
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.FullReset">
             <summary>
-            Builds a UnisonBonusAwardPacket for the given phrase time.
+            Fully resets all state including band player counts. Call when leaving a lobby.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Sessions.UnisonCoordinator.BuildAwardPacket(System.Guid,System.Int32,System.Double)">
+            <summary>
+            Builds a UnisonBonusAwardPacket for the given phrase time and band.
             </summary>
         </member>
         <member name="M:YARG.Net.Sessions.UnisonCoordinator.NormalizePhraseTime(System.Double)">
@@ -2657,6 +3372,11 @@
             The number of players who completed the phrase.
             </summary>
         </member>
+        <member name="P:YARG.Net.Sessions.UnisonBonusEventArgs.BandId">
+            <summary>
+            The band ID that this unison bonus applies to.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Transport.ChannelType">
             <summary>
             Logical channels map onto transport-specific delivery guarantees.
@@ -2667,9 +3387,42 @@
             Represents a logical peer connected to the transport.
             </summary>
         </member>
+        <member name="T:YARG.Net.Transport.TransportLogger">
+            <summary>
+            Static logging helper for the transport layer.
+            Set LogAction from Unity side to capture logs.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Transport.TransportLogger.LogAction">
+            <summary>
+            Set this delegate from Unity to capture transport-layer logs.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Transport.TransportLogger.Log(System.String)">
+            <summary>
+            Log a message. Goes to LogAction if set, otherwise Console.WriteLine.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Transport.LiteNetLibTransport">
             <summary>
             LiteNetLib-backed implementation of <see cref="T:YARG.Net.Transport.INetTransport"/> for production networking.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Transport.LiteNetLibTransport.OnUnconnectedMessage">
+            <summary>
+            Fired when an unconnected message is received (used for discovery).
+            Parameters: remoteEndPoint, data
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Transport.LiteNetLibTransport.OnLatencyUpdate">
+            <summary>
+            Fired when latency to a peer is updated.
+            Parameters: connection, latencyMs
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Transport.LiteNetLibTransport.NetManager">
+            <summary>
+            Gets the underlying NetManager for advanced operations (discovery, etc).
             </summary>
         </member>
         <member name="T:YARG.Net.Transport.NullTransport">
@@ -2868,6 +3621,145 @@
         <member name="M:YARG.Net.Utilities.StunResolver.QueryServerAsync(System.String,System.Int32,System.Int32,System.Threading.CancellationToken)">
             <summary>
             Queries a single STUN server for the public IP address.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.UPnPClient">
+            <summary>
+            Client for UPnP (Universal Plug and Play) port mapping operations.
+            Enables automatic port forwarding on supported routers.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Utilities.UPnP.UPnPClient.IsAvailable">
+            <summary>
+            Gets whether UPnP is available (a compatible gateway device was found).
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Utilities.UPnP.UPnPClient.Device">
+            <summary>
+            Gets the cached device information, if available.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.#ctor(System.Nullable{System.TimeSpan})">
+            <summary>
+            Creates a new UPnP client.
+            </summary>
+            <param name="discoveryTimeout">Timeout for device discovery. Default is 3 seconds.</param>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.DiscoverAsync(System.Threading.CancellationToken)">
+            <summary>
+            Discovers a UPnP-capable gateway device on the network.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>True if a device was discovered, false otherwise.</returns>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.AddPortMappingAsync(YARG.Net.Utilities.UPnP.PortMapping,System.Threading.CancellationToken)">
+            <summary>
+            Adds a port mapping on the gateway device.
+            </summary>
+            <param name="mapping">The port mapping to add.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Result of the operation.</returns>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.RemovePortMappingAsync(System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
+            <summary>
+            Removes a port mapping from the gateway device.
+            </summary>
+            <param name="externalPort">The external port to unmap.</param>
+            <param name="protocol">The protocol (TCP or UDP).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>Result of the operation.</returns>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.GetExternalIPAddressAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets the external (public) IP address from the gateway device.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The external IP address, or null if unavailable.</returns>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.GetPortMappingAsync(System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
+            <summary>
+            Checks if a specific port mapping exists.
+            </summary>
+            <param name="externalPort">The external port to check.</param>
+            <param name="protocol">The protocol (TCP or UDP).</param>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>The existing mapping if found, null otherwise.</returns>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.UPnPResult">
+            <summary>
+            Result of a UPnP operation.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.PortMapping">
+            <summary>
+            Represents a UPnP port mapping.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.PortMapping.#ctor(System.Int32,System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Represents a UPnP port mapping.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.PortMappingProtocol">
+            <summary>
+            Port mapping protocol.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.UPnPException">
+            <summary>
+            Exception thrown for UPnP-specific errors.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.UPnPDiscovery">
+            <summary>
+            Handles SSDP (Simple Service Discovery Protocol) discovery of UPnP devices.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPDiscovery.DiscoverAsync(System.TimeSpan,System.Threading.CancellationToken)">
+            <summary>
+            Discovers a UPnP gateway device on the local network.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPDiscovery.GetLocalLanAddress">
+            <summary>
+            Gets the local LAN IP address by determining which interface would be used
+            to reach a public address. This ensures we bind to the correct interface
+            on systems with multiple network adapters.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.UPnPDevice">
+            <summary>
+            Represents a discovered UPnP device.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPDevice.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Represents a discovered UPnP device.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Utilities.UPnP.UPnPSoap">
+            <summary>
+            Handles SOAP requests for UPnP port mapping operations.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.AddPortMappingAsync(YARG.Net.Utilities.UPnP.UPnPDevice,YARG.Net.Utilities.UPnP.PortMapping,System.Threading.CancellationToken)">
+            <summary>
+            Adds a port mapping on the UPnP device.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.DeletePortMappingAsync(YARG.Net.Utilities.UPnP.UPnPDevice,System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
+            <summary>
+            Deletes a port mapping from the UPnP device.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.GetExternalIPAddressAsync(YARG.Net.Utilities.UPnP.UPnPDevice,System.Threading.CancellationToken)">
+            <summary>
+            Gets the external IP address from the UPnP device.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.GetSpecificPortMappingAsync(YARG.Net.Utilities.UPnP.UPnPDevice,System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
+            <summary>
+            Gets a specific port mapping entry.
             </summary>
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.ExperimentalAttribute">

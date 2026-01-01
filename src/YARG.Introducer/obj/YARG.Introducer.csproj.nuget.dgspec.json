@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj": {}
+    "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj": {}
   },
   "projects": {
-    "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj": {
+    "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj",
+        "projectUniqueName": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj",
         "projectName": "YARG.Introducer",
-        "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj",
+        "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Introducer\\YARG.Introducer.csproj",
         "packagesPath": "C:\\Users\\opria\\.nuget\\packages\\",
-        "outputPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Introducer\\obj\\",
+        "outputPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Introducer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\opria\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
-                "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj"
+              "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
+                "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj"
               }
             }
           }
@@ -70,14 +70,14 @@
         }
       }
     },
-    "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
+    "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
+        "projectUniqueName": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
         "projectName": "YARG.Net",
-        "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
+        "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj",
         "packagesPath": "C:\\Users\\opria\\.nuget\\packages\\",
-        "outputPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\obj\\",
+        "outputPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\opria\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -117,6 +117,12 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
+            },
+            "PolySharp": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.14.1, )"
             },
             "System.Text.Json": {
               "target": "Package",

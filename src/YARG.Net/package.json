@@ -1,0 +1,8 @@
+{
+  "name": "in.yarg.net",
+  "version": "0.1.0",
+  "displayName": "YARG.Net",
+  "description": "Networking library for YARG multiplayer functionality.",
+  "unity": "2021.3",
+  "license": "MIT"
+}

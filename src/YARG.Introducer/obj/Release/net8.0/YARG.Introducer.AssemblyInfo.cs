@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YARG.Introducer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a68c54bebb3f5ed4f9bda0dd9b71627183191b4c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d3fb44984a1c231dfb552401a64b830c0f7b9b9")]
 [assembly: System.Reflection.AssemblyProductAttribute("YARG.Introducer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YARG.Introducer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

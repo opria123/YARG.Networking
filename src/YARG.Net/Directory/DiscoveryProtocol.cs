@@ -126,6 +126,37 @@ public sealed class DiscoveredLobbyInfo
     public string[] PlayerNames { get; set; } = Array.Empty<string>();
     public int[] PlayerInstruments { get; set; } = Array.Empty<int>();
     public DateTime LastSeen { get; set; } = DateTime.UtcNow;
+    
+    /// <summary>
+    /// Session type: 0 = Server (persistent, bookmarkable), 1 = Lobby (ephemeral UPnP, not bookmarkable).
+    /// </summary>
+    public int SessionType { get; set; }
+    
+    // Gameplay settings visible before joining
+    /// <summary>
+    /// Whether No Fail mode is enabled for this lobby.
+    /// </summary>
+    public bool NoFailMode { get; set; }
+    
+    /// <summary>
+    /// Whether only shared songs can be played.
+    /// </summary>
+    public bool SharedSongsOnly { get; set; }
+    
+    /// <summary>
+    /// Maximum band size (0 = unlimited).
+    /// </summary>
+    public int BandSize { get; set; }
+    
+    /// <summary>
+    /// Allowed game modes for this lobby (as int values). Empty means all modes allowed.
+    /// </summary>
+    public int[] AllowedGameModes { get; set; } = Array.Empty<int>();
+    
+    /// <summary>
+    /// Whether this lobby is hosted by a dedicated server (no host player).
+    /// </summary>
+    public bool IsDedicatedServer { get; set; }
 }
 
 /// <summary>
@@ -185,6 +216,27 @@ public sealed class DiscoveryResponseBuilder
                 WriteInt(instrument);
             }
         }
+        
+        // Gameplay settings (added for lobby browser preview)
+        WriteBool(lobby.NoFailMode);
+        WriteBool(lobby.SharedSongsOnly);
+        WriteInt(lobby.BandSize);
+        
+        // Allowed game modes
+        WriteInt(lobby.AllowedGameModes?.Length ?? 0);
+        if (lobby.AllowedGameModes != null)
+        {
+            foreach (var mode in lobby.AllowedGameModes)
+            {
+                WriteInt(mode);
+            }
+        }
+        
+        // Session type (0 = Server, 1 = Lobby)
+        WriteInt(lobby.SessionType);
+        
+        // Dedicated server flag
+        WriteBool(lobby.IsDedicatedServer);
         
         return this;
     }
@@ -272,6 +324,34 @@ public ref struct DiscoveryResponseParser
                 lobby.PlayerInstruments[i] = ReadInt();
             }
             
+            // Gameplay settings (optional for backward compatibility with older hosts)
+            if (HasMoreData())
+            {
+                lobby.NoFailMode = ReadBool();
+                lobby.SharedSongsOnly = ReadBool();
+                lobby.BandSize = ReadInt();
+                
+                // Allowed game modes
+                int gameModesCount = ReadInt();
+                lobby.AllowedGameModes = new int[gameModesCount];
+                for (int i = 0; i < gameModesCount; i++)
+                {
+                    lobby.AllowedGameModes[i] = ReadInt();
+                }
+                
+                // Session type (optional for backward compatibility)
+                if (HasMoreData())
+                {
+                    lobby.SessionType = ReadInt();
+                    
+                    // Dedicated server flag (optional for backward compatibility)
+                    if (HasMoreData())
+                    {
+                        lobby.IsDedicatedServer = ReadBool();
+                    }
+                }
+            }
+            
             lobby.IsActive = true;
             lobby.LastSeen = DateTime.UtcNow;
             
@@ -281,6 +361,11 @@ public ref struct DiscoveryResponseParser
         {
             return false;
         }
+    }
+    
+    private bool HasMoreData()
+    {
+        return _position < _data.Length;
     }
     
     private int ReadInt()
@@ -333,6 +418,11 @@ public sealed class DiscoveryManager
     public event Action<DiscoveredLobbyInfo>? LobbyDiscovered;
     
     /// <summary>
+    /// Raised when an existing lobby is updated (refreshed).
+    /// </summary>
+    public event Action<DiscoveredLobbyInfo>? LobbyUpdated;
+    
+    /// <summary>
     /// Raised when a lobby times out.
     /// </summary>
     public event Action<string>? LobbyLost;
@@ -372,6 +462,10 @@ public sealed class DiscoveryManager
         if (isNew)
         {
             LobbyDiscovered?.Invoke(lobby);
+        }
+        else
+        {
+            LobbyUpdated?.Invoke(lobby);
         }
         
         return isNew;

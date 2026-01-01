@@ -207,11 +207,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.ServerHost\\YARG.ServerHost.csproj",
+      "projectUniqueName": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.ServerHost\\YARG.ServerHost.csproj",
       "projectName": "YARG.ServerHost",
-      "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.ServerHost\\YARG.ServerHost.csproj",
+      "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.ServerHost\\YARG.ServerHost.csproj",
       "packagesPath": "C:\\Users\\opria\\.nuget\\packages\\",
-      "outputPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.ServerHost\\obj\\",
+      "outputPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.ServerHost\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\opria\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -226,8 +226,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
-              "projectPath": "F:\\projects\\YARG-development\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj"
+            "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj": {
+              "projectPath": "F:\\projects\\YARG-development\\YARG\\YARG.Networking\\src\\YARG.Net\\YARG.Net.csproj"
             }
           }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using YARG.Net.Handlers.Server;
 using YARG.Net.Packets;
 using YARG.Net.Transport;
 
@@ -264,6 +265,16 @@ public sealed class DefaultServerRuntime : IServerRuntime
 
     private void HandlePayloadReceived(INetConnection connection, ReadOnlyMemory<byte> payload, ChannelType channel)
     {
+        // First, try to handle as a binary packet (gameplay snapshots, etc.)
+        // Binary packets have the first byte as PacketType enum value
+        var binaryRelay = _configuredOptions?.BinaryPacketRelay;
+        if (binaryRelay != null && binaryRelay.TryHandleBinaryPacket(connection, payload, channel))
+        {
+            // Binary packet was handled (relayed to other clients)
+            return;
+        }
+
+        // Not a binary packet - try JSON dispatcher
         var dispatcher = _configuredOptions?.PacketDispatcher;
         if (dispatcher is null)
         {

@@ -59,6 +59,11 @@ public enum MenuTarget
     /// Difficulty selection screen.
     /// </summary>
     DifficultySelect = 3,
+    
+    /// <summary>
+    /// Pop the current menu (go back one level).
+    /// </summary>
+    PopMenu = 100,
 }
 
 #region Binary Packet Builders
@@ -80,6 +85,29 @@ public static class NavigationBinaryPackets
     /// Parses a navigate to menu packet.
     /// </summary>
     public static bool TryParseNavigatePacket(ReadOnlySpan<byte> data, out MenuTarget target)
+    {
+        target = MenuTarget.None;
+        
+        if (data.Length < 2)
+            return false;
+
+        target = (MenuTarget)data[1];
+        return true;
+    }
+
+    /// <summary>
+    /// Builds a navigation request packet (client -> server).
+    /// Used by designated host on dedicated servers to request navigation.
+    /// </summary>
+    public static byte[] BuildNavigationRequestPacket(MenuTarget target)
+    {
+        return new byte[] { (byte)PacketType.NavigationRequest, (byte)target };
+    }
+
+    /// <summary>
+    /// Parses a navigation request packet.
+    /// </summary>
+    public static bool TryParseNavigationRequestPacket(ReadOnlySpan<byte> data, out MenuTarget target)
     {
         target = MenuTarget.None;
         

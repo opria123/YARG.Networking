@@ -12,6 +12,10 @@ using YARG.Net.Handlers.Server;
 
 namespace YARG.ServerHost;
 
+/// <summary>
+/// Standalone YARG dedicated server host.
+/// Uses ServerNetworkingBootstrapper to initialize the server stack.
+/// </summary>
 internal static class Program
 {
     public static async Task<int> Main(string[] args)
@@ -25,64 +29,60 @@ internal static class Program
             shutdownCts.Cancel();
         };
 
-        Console.WriteLine($"Starting YARG.ServerHost on port {options.Port} (NAT punch: {options.EnableNatPunchThrough}, max players: {options.MaxPlayers}).");
+        Console.WriteLine($"Starting YARG Dedicated Server on port {options.Port} (max players: {options.MaxPlayers}).");
         if (!string.IsNullOrEmpty(options.Password))
         {
             Console.WriteLine("Lobby password is enabled.");
         }
+        if (!string.IsNullOrEmpty(options.LobbyName))
+        {
+            Console.WriteLine($"Lobby name: {options.LobbyName}");
+        }
 
+        // Create transport and serializer
         using var transport = new LiteNetLibTransport();
-        var serializer = new JsonNetSerializer();
-        var sessionManager = new SessionManager(options.MaxPlayers);
-        var lobbyManager = new LobbyStateManager(sessionManager, new LobbyConfiguration { MaxPlayers = options.MaxPlayers });
-        using var lobbyCoordinator = new ServerLobbyCoordinator(sessionManager, lobbyManager, serializer);
-        var dispatcher = new PacketDispatcher(serializer);
-        var lobbyCommandHandler = new ServerLobbyCommandHandler(sessionManager, lobbyManager);
-        lobbyCommandHandler.Register(dispatcher);
+        var serializer = new NewtonsoftNetSerializer();
 
-        var handshakeHandler = new ServerHandshakeHandler(
-            sessionManager,
+        // Use ServerNetworkingBootstrapper to create the full server stack
+        // Pass password during initialization
+        var server = ServerNetworkingBootstrapper.InitializeDedicatedServer(
+            transport,
             serializer,
-            new HandshakeServerOptions
-            {
-                Password = options.Password,
-            });
+            options.Port,
+            options.MaxPlayers,
+            password: options.Password);
 
-        handshakeHandler.Register(dispatcher);
-        handshakeHandler.HandshakeAccepted += (_, session) =>
+        // Set lobby name if provided
+        if (!string.IsNullOrEmpty(options.LobbyName))
         {
-            Console.WriteLine($"Handshake accepted for {session.PlayerName} ({session.Connection.EndPoint}).");
-            lobbyCoordinator.HandleHandshakeAccepted(session);
+            server.LobbyName = options.LobbyName;
+        }
+
+        // Hook up connection events for logging and discovery updates
+        server.ConnectionManager.ClientAuthenticated += (_, args) =>
+        {
+            var identity = args.Client.Identity;
+            Console.WriteLine($"Player authenticated: {identity?.DisplayName ?? "Unknown"} ({args.Client.Connection.EndPoint})");
+            Console.WriteLine($"Players: {server.CurrentPlayerCount}/{options.MaxPlayers}");
+            server.UpdateDiscoveryPlayerCount();
         };
 
-        handshakeHandler.HandshakeRejected += (_, args) =>
+        server.ConnectionManager.ClientDisconnected += (_, args) =>
         {
-            Console.WriteLine($"Handshake rejected from {args.Context.Connection.EndPoint}: {args.Reason}");
+            Console.WriteLine($"Player disconnected: {args.Identity?.DisplayName ?? args.ConnectionId.ToString()}");
+            Console.WriteLine($"Players: {server.CurrentPlayerCount}/{options.MaxPlayers}");
+            server.UpdateDiscoveryPlayerCount();
         };
 
-        dispatcher.RegisterHandler<HeartbeatPacket>(PacketType.Heartbeat, (context, envelope, _) =>
-        {
-            Console.WriteLine($"Heartbeat from {context.Connection.Id} at {envelope.Payload.TimestampUnixMs}.");
-            return Task.CompletedTask;
-        });
-
-        transport.OnPeerDisconnected += connection =>
-        {
-            Console.WriteLine($"Peer disconnected: {connection.EndPoint} ({connection.Id}).");
-            lobbyCoordinator.HandlePeerDisconnected(connection.Id);
-        };
-
-        var runtime = new DefaultServerRuntime();
-        runtime.Configure(new ServerRuntimeOptions
-        {
-            Transport = transport,
-            Port = options.Port,
-            EnableNatPunchThrough = options.EnableNatPunchThrough,
-            PacketDispatcher = dispatcher,
-        });
-
-        await runtime.StartAsync(shutdownCts.Token);
+        // Start the server
+        await server.Runtime.StartAsync(shutdownCts.Token);
+        
+        // Start discovery advertising so clients can find this server
+        server.StartDiscovery();
+        
         Console.WriteLine("Server running. Press Ctrl+C to shut down.");
+        Console.WriteLine($"Players: {server.CurrentPlayerCount}/{options.MaxPlayers}");
+        Console.WriteLine("Discovery is active - clients can now find this server.");
 
         try
         {
@@ -90,10 +90,11 @@ internal static class Program
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine("Shutdown requested, stopping transport...");
+            Console.WriteLine("Shutdown requested, stopping server...");
         }
 
-        await runtime.StopAsync();
+        server.StopDiscovery();
+        await server.Runtime.StopAsync();
         return 0;
     }
 
@@ -109,9 +110,6 @@ internal static class Program
                     options = options with { Port = port };
                     i++;
                     break;
-                case "--nat":
-                    options = options with { EnableNatPunchThrough = true };
-                    break;
                 case "--max-players" when i + 1 < args.Length && int.TryParse(args[i + 1], out var maxPlayers):
                     options = options with { MaxPlayers = Math.Clamp(maxPlayers, 1, 64) };
                     i++;
@@ -120,11 +118,34 @@ internal static class Program
                     options = options with { Password = args[i + 1] };
                     i++;
                     break;
+                case "--name" when i + 1 < args.Length:
+                    options = options with { LobbyName = args[i + 1] };
+                    i++;
+                    break;
+                case "--help":
+                case "-h":
+                    PrintHelp();
+                    Environment.Exit(0);
+                    break;
             }
         }
 
         return options;
     }
 
-    private sealed record HostOptions(int Port = 7777, bool EnableNatPunchThrough = false, int MaxPlayers = 8, string? Password = null);
+    private static void PrintHelp()
+    {
+        Console.WriteLine("YARG Dedicated Server");
+        Console.WriteLine();
+        Console.WriteLine("Usage: YARG.ServerHost [options]");
+        Console.WriteLine();
+        Console.WriteLine("Options:");
+        Console.WriteLine("  --port <port>         Server port (default: 7777)");
+        Console.WriteLine("  --max-players <num>   Maximum players (default: 8, range: 1-64)");
+        Console.WriteLine("  --password <pass>     Lobby password (optional)");
+        Console.WriteLine("  --name <name>         Lobby name (default: YARG Server)");
+        Console.WriteLine("  --help, -h            Show this help message");
+    }
+
+    private sealed record HostOptions(int Port = 7777, int MaxPlayers = 8, string? Password = null, string? LobbyName = null);
 }

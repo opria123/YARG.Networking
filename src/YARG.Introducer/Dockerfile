@@ -13,16 +13,12 @@ USER appuser
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /src
 
-# Copy solution and project files for better layer caching
-COPY ["src/YARG.Introducer/YARG.Introducer.csproj", "src/YARG.Introducer/"]
-COPY ["src/YARG.Net/YARG.Net.csproj", "src/YARG.Net/"]
-
-RUN dotnet restore "src/YARG.Introducer/YARG.Introducer.csproj"
-
-# Copy all source code
+# Copy all source code first
 COPY . .
 
+# Restore and build
 WORKDIR "/src/src/YARG.Introducer"
+RUN dotnet restore "YARG.Introducer.csproj"
 RUN dotnet build "YARG.Introducer.csproj" -c Release -o /app/build --no-restore
 
 FROM build AS publish

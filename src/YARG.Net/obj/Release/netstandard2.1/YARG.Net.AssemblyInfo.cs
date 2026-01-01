@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Core networking abstractions for YARG.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46211ec05f66ec82e5094ae5ce22743c134434c3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d3fb44984a1c231dfb552401a64b830c0f7b9b9")]
 [assembly: System.Reflection.AssemblyProductAttribute("YARG.Net")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YARG.Net")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

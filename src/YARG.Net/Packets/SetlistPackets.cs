@@ -153,6 +153,14 @@ public static class SetlistBinaryPackets
     }
 
     /// <summary>
+    /// Builds a setlist start request packet (from designated host to server).
+    /// </summary>
+    public static byte[] BuildStartRequestPacket()
+    {
+        return new byte[] { (byte)PacketType.SetlistStartRequest };
+    }
+
+    /// <summary>
     /// Parsed setlist entry data.
     /// </summary>
     public readonly struct ParsedEntry

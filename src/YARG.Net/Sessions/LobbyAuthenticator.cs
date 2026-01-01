@@ -120,6 +120,44 @@ public sealed class LobbyAuthenticator
     }
 
     /// <summary>
+    /// Validates a password without tracking connection state.
+    /// Useful when connection GUID is not available.
+    /// </summary>
+    /// <param name="password">The password to validate.</param>
+    /// <param name="resultMessage">Output message describing the result.</param>
+    /// <returns>True if the password is valid (or no password is required).</returns>
+    public bool Validate(string? password, out string resultMessage)
+    {
+        lock (_gate)
+        {
+            // If no password required, always valid
+            if (!_requiresPassword)
+            {
+                resultMessage = "No password required";
+                return true;
+            }
+
+            // Check lobby capacity
+            if (_currentPlayerCount >= _maxPlayers)
+            {
+                resultMessage = "Lobby is full";
+                return false;
+            }
+
+            // Verify password
+            var providedHash = HashPassword(password ?? string.Empty);
+            if (!string.Equals(_passwordHash, providedHash, StringComparison.Ordinal))
+            {
+                resultMessage = "Incorrect password";
+                return false;
+            }
+
+            resultMessage = "Success";
+            return true;
+        }
+    }
+
+    /// <summary>
     /// Processes an authentication request.
     /// </summary>
     /// <returns>The authentication result.</returns>

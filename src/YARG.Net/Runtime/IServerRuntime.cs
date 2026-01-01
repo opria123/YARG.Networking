@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using YARG.Net.Handlers.Server;
 using YARG.Net.Packets.Dispatch;
 using YARG.Net.Transport;
 
@@ -105,6 +106,12 @@ public sealed record ServerRuntimeOptions
     /// Optional connection manager. If not provided, a default one will be created.
     /// </summary>
     public IServerConnectionManager? ConnectionManager { get; init; }
+
+    /// <summary>
+    /// Optional binary packet relay handler for handling gameplay snapshots and other binary packets.
+    /// If provided, binary packets will be checked first before JSON dispatch.
+    /// </summary>
+    public ServerBinaryPacketRelay? BinaryPacketRelay { get; init; }
 
     /// <summary>
     /// Whether this is a dedicated server (no local host player).

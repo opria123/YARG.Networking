@@ -132,6 +132,55 @@ public static class GameplayBinaryPackets
     }
 
     /// <summary>
+    /// Builds a gameplay load ready packet.
+    /// Sent by clients to signal they have finished loading the song.
+    /// </summary>
+    public static byte[] BuildGameplayLoadReadyPacket(string playerName)
+    {
+        var nameBytes = System.Text.Encoding.UTF8.GetBytes(playerName ?? string.Empty);
+        byte[] buffer = new byte[1 + 2 + nameBytes.Length];
+        var writer = new PacketWriter(buffer);
+        
+        writer.WritePacketType(PacketType.GameplayLoadReady);
+        writer.WriteString(playerName);
+        
+        return buffer;
+    }
+
+    /// <summary>
+    /// Parses a gameplay load ready packet.
+    /// </summary>
+    public static bool TryParseGameplayLoadReadyPacket(ReadOnlySpan<byte> data, out string playerName)
+    {
+        playerName = string.Empty;
+        
+        if (data.Length < 3)
+            return false;
+
+        var reader = new PacketReader(data);
+        reader.Skip(1); // Skip packet type
+        
+        try
+        {
+            playerName = reader.ReadString();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Builds a gameplay all load ready packet.
+    /// Sent by host to all clients when everyone has finished loading.
+    /// </summary>
+    public static byte[] BuildGameplayAllLoadReadyPacket()
+    {
+        return new byte[] { (byte)PacketType.GameplayAllLoadReady };
+    }
+
+    /// <summary>
     /// Parses a player left gameplay packet.
     /// </summary>
     public static bool TryParsePlayerLeftPacket(ReadOnlySpan<byte> data, out string playerName)

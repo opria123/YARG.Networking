@@ -38,6 +38,14 @@ public static class ScoreBinaryPackets
     }
 
     /// <summary>
+    /// Builds a score screen advance request packet (for designated host on dedicated server).
+    /// </summary>
+    public static byte[] BuildAdvanceRequestPacket()
+    {
+        return new byte[] { (byte)PacketType.ScoreScreenAdvanceRequest };
+    }
+
+    /// <summary>
     /// Builds a score results packet.
     /// </summary>
     public static byte[] BuildResultsPacket(
