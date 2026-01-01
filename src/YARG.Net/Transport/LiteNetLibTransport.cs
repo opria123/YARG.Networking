@@ -17,6 +17,11 @@ namespace YARG.Net.Transport;
 public static class TransportLogger
 {
     /// <summary>
+    /// Enable verbose logging (per-packet logs). Default false for production.
+    /// </summary>
+    public static bool VerboseLogging { get; set; } = false;
+    
+    /// <summary>
     /// Set this delegate from Unity to capture transport-layer logs.
     /// </summary>
     public static Action<string>? LogAction { get; set; }
@@ -33,6 +38,18 @@ public static class TransportLogger
         else
         {
             Console.WriteLine(message);
+        }
+    }
+    
+    /// <summary>
+    /// Log a verbose message (only if VerboseLogging is enabled).
+    /// Use for per-packet and high-frequency logs.
+    /// </summary>
+    public static void LogVerbose(string message)
+    {
+        if (VerboseLogging)
+        {
+            Log(message);
         }
     }
 }
@@ -110,8 +127,9 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener
         }
     }
 
-    private static long _pollCount = 0;
-    private static DateTime _lastPollLog = DateTime.MinValue;
+    // Instance-level poll tracking (was static - unsafe for multiple instances)
+    private long _pollCount = 0;
+    private DateTime _lastPollLog = DateTime.MinValue;
 
     public void Poll(TimeSpan timeout)
     {
@@ -120,14 +138,13 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener
             return;
         }
 
-        // Log poll status every 10 seconds to confirm polling is active
+        // Log poll status every 10 seconds (verbose only)
         _pollCount++;
         var now = DateTime.UtcNow;
-        if ((now - _lastPollLog).TotalSeconds >= 10)
+        if (TransportLogger.VerboseLogging && (now - _lastPollLog).TotalSeconds >= 10)
         {
-            // Enable statistics temporarily to see packet counts
             var stats = _netManager.Statistics;
-            TransportLogger.Log($"[LiteNetLibTransport.Poll] Poll active: count={_pollCount}, connectedPeers={_netManager.ConnectedPeersCount}, isRunning={_netManager.IsRunning}, unconnectedEnabled={_netManager.UnconnectedMessagesEnabled}, reuseAddr={_netManager.ReuseAddress}, packetsReceived={stats.PacketsReceived}, bytesReceived={stats.BytesReceived}");
+            TransportLogger.LogVerbose($"[LiteNetLibTransport.Poll] Poll active: count={_pollCount}, connectedPeers={_netManager.ConnectedPeersCount}, packetsReceived={stats.PacketsReceived}, bytesReceived={stats.BytesReceived}");
             _lastPollLog = now;
         }
 
@@ -187,7 +204,7 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener
 
     void INetEventListener.OnPeerConnected(NetPeer peer)
     {
-        TransportLogger.Log($"[LiteNetLibTransport] OnPeerConnected: {peer.EndPoint}, connectedPeers={_netManager?.ConnectedPeersCount ?? -1}, unconnectedEnabled={_netManager?.UnconnectedMessagesEnabled ?? false}");
+        TransportLogger.Log($"[LiteNetLibTransport] Peer connected: {peer.EndPoint}");
         var connection = GetOrAddConnection(peer);
         OnPeerConnected?.Invoke(connection);
     }
@@ -212,9 +229,12 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener
         var payload = reader.GetRemainingBytes();
         reader.Recycle();
         
-        // Log every packet received at transport level
-        var firstByte = payload.Length > 0 ? payload[0] : (byte)0;
-        TransportLogger.Log($"[LiteNetLibTransport.OnNetworkReceive] Received packet: length={payload.Length}, firstByte={firstByte}, from={peer.EndPoint}, channel={deliveryMethod}");
+        // Verbose per-packet logging (disabled by default for performance)
+        if (TransportLogger.VerboseLogging)
+        {
+            var firstByte = payload.Length > 0 ? payload[0] : (byte)0;
+            TransportLogger.LogVerbose($"[LiteNetLibTransport] Received packet: len={payload.Length}, type={firstByte}, from={peer.EndPoint}");
+        }
 
         var channel = deliveryMethod switch
         {
@@ -235,12 +255,12 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener
         {
             var data = reader.GetRemainingBytes();
             reader.Recycle();
-            TransportLogger.Log($"[LiteNetLibTransport] OnNetworkReceiveUnconnected from {remoteEndPoint}, type={messageType}, bytes={data.Length}, hasSubscribers={OnUnconnectedMessage != null}, connectedPeers={_netManager?.ConnectedPeersCount ?? -1}");
+            TransportLogger.LogVerbose($"[LiteNetLibTransport] Unconnected message from {remoteEndPoint}, type={messageType}, bytes={data.Length}");
             OnUnconnectedMessage?.Invoke(remoteEndPoint, data);
         }
         catch (Exception ex)
         {
-            TransportLogger.Log($"[LiteNetLibTransport] ERROR in OnNetworkReceiveUnconnected: {ex.Message}\n{ex.StackTrace}");
+            TransportLogger.Log($"[LiteNetLibTransport] ERROR in OnNetworkReceiveUnconnected: {ex.Message}");
         }
     }
 

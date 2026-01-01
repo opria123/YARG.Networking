@@ -43,15 +43,12 @@ internal sealed class LiteNetLibConnection : INetConnection
             return;
         }
         
-        // Log every send attempt for debugging
         var peerState = _peer.ConnectionState;
-        var firstByte = payload[0];
-        TransportLogger.Log($"[LiteNetLibConnection.Send] Attempting send: length={payload.Length}, firstByte={firstByte}, peerState={peerState}, endpoint={EndPoint}");
         
         // Verify peer is still connected
         if (peerState != ConnectionState.Connected)
         {
-            TransportLogger.Log($"[LiteNetLibConnection] WARNING: Send called but peer state is {peerState}, not Connected! Packet dropped (length={payload.Length}, firstByte={firstByte})");
+            TransportLogger.Log($"[LiteNetLibConnection] WARNING: Send dropped - peer state is {peerState} (len={payload.Length})");
             return;
         }
 
@@ -65,6 +62,11 @@ internal sealed class LiteNetLibConnection : INetConnection
 
         var buffer = payload.ToArray();
         _peer.Send(buffer, method);
-        TransportLogger.Log($"[LiteNetLibConnection.Send] Sent successfully: length={payload.Length}, firstByte={firstByte}, method={method}");
+        
+        // Verbose per-packet logging (disabled by default)
+        if (TransportLogger.VerboseLogging)
+        {
+            TransportLogger.LogVerbose($"[LiteNetLibConnection] Sent: len={payload.Length}, type={payload[0]}, method={method}");
+        }
     }
 }
