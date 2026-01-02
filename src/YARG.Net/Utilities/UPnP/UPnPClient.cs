@@ -235,6 +235,46 @@ public sealed class UPnPClient : IDisposable
     }
 
     /// <summary>
+    /// Lists all port mappings on the gateway device.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>List of all port mappings, or empty list on error.</returns>
+    public async Task<System.Collections.Generic.List<PortMapping>> GetAllMappingsAsync(CancellationToken cancellationToken = default)
+    {
+        var result = new System.Collections.Generic.List<PortMapping>();
+        var device = _cachedDevice;
+        
+        if (device == null)
+        {
+            return result;
+        }
+
+        try
+        {
+            var mappings = await device.GetAllMappingsAsync();
+            foreach (var mapping in mappings)
+            {
+                var protocol = mapping.Protocol == Protocol.Tcp ? PortMappingProtocol.TCP : PortMappingProtocol.UDP;
+                result.Add(new PortMapping(
+                    ExternalPort: mapping.PublicPort,
+                    InternalPort: mapping.PrivatePort,
+                    Protocol: protocol,
+                    Description: mapping.Description ?? "",
+                    InternalClient: mapping.PrivateIP?.ToString() ?? "",
+                    LeaseDuration: mapping.Lifetime,
+                    Enabled: true
+                ));
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"Failed to list mappings: {ex.Message}");
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Checks if a specific port mapping exists.
     /// </summary>
     /// <param name="externalPort">The external port to check.</param>

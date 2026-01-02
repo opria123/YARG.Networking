@@ -14,6 +14,7 @@ primary_region = 'iad'
   PUNCH_PORT = '9051'
   RELAY_PORT = '9052'
 
+# HTTP service for API endpoints
 [http_service]
   internal_port = 8080
   force_https = true
@@ -21,40 +22,15 @@ primary_region = 'iad'
   auto_start_machines = true
   min_machines_running = 1
 
+# UDP service for NAT punch coordination
 [[services]]
   protocol = 'udp'
   internal_port = 9051
+  auto_stop_machines = false
+  auto_start_machines = true
 
   [[services.ports]]
     port = 9051
-
-[[services]]
-  protocol = 'udp'
-  internal_port = 9052
-
-  [[services.ports]]
-    port = 9052
-
-[[services]]
-  protocol = 'tcp'
-  internal_port = 8080
-
-  [[services.ports]]
-    port = 443
-    handlers = ['tls', 'http']
-
-  [services.concurrency]
-    type = 'connections'
-    hard_limit = 100
-    soft_limit = 80
-
-  [[services.http_checks]]
-    interval = '10s'
-    timeout = '2s'
-    grace_period = '10s'
-    method = 'get'
-    path = '/health'
-    protocol = 'http'
 
 [[vm]]
   memory = '1gb'

@@ -127,6 +127,17 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener, INat
             throw new InvalidOperationException("LiteNetLib failed to start with the provided options.");
         }
 
+        // Log server start details
+        if (options.IsServer)
+        {
+            TransportLogger.Log($"[LiteNetLibTransport] Server started - listening on UDP port {options.Port}");
+            TransportLogger.Log($"[LiteNetLibTransport] Server LocalPort: {_netManager.LocalPort}, NatPunchEnabled: {_netManager.NatPunchEnabled}");
+        }
+        else
+        {
+            TransportLogger.Log($"[LiteNetLibTransport] Client started - local port {_netManager.LocalPort}");
+        }
+
         if (!options.IsServer)
         {
             if (string.IsNullOrWhiteSpace(options.Address))
@@ -362,6 +373,7 @@ public sealed class LiteNetLibTransport : INetTransport, INetEventListener, INat
 
     void INetEventListener.OnConnectionRequest(ConnectionRequest request)
     {
+        TransportLogger.Log($"[LiteNetLibTransport] Received connection request from {request.RemoteEndPoint}");
         request.AcceptIfKey(string.Empty);
     }
     
