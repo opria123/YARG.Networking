@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace YARG.Net.Directory;
 
 /// <summary>
-/// Client interface for advertising a lobby to the introducer service.
+/// Client interface for advertising a lobby to the lobby server service.
 /// </summary>
 public interface ILobbyAdvertiser : IDisposable
 {
@@ -35,7 +35,7 @@ public interface ILobbyAdvertiser : IDisposable
 }
 
 /// <summary>
-/// HTTP-based client for advertising lobbies to the introducer service.
+/// HTTP-based client for advertising lobbies to the lobby server service.
 /// </summary>
 public sealed class LobbyAdvertiser : ILobbyAdvertiser
 {
@@ -57,7 +57,7 @@ public sealed class LobbyAdvertiser : ILobbyAdvertiser
     /// <summary>
     /// Creates a new lobby advertiser.
     /// </summary>
-    /// <param name="introducerBaseUri">Base URI of the introducer service.</param>
+    /// <param name="introducerBaseUri">Base URI of the lobby server service.</param>
     /// <param name="httpClient">Optional HttpClient instance.</param>
     public LobbyAdvertiser(Uri introducerBaseUri, HttpClient? httpClient = null)
     {
@@ -239,7 +239,7 @@ public sealed class LobbyAdvertiser : ILobbyAdvertiser
             var json = JsonSerializer.Serialize(advertisement, JsonOptions);
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
             using var response = await _httpClient.PostAsync(_advertiseUri, content, cancellationToken).ConfigureAwait(false);
-            // We don't require success - introducer might be down temporarily
+            // We don't require success - lobby server might be down temporarily
         }
         catch (OperationCanceledException)
         {

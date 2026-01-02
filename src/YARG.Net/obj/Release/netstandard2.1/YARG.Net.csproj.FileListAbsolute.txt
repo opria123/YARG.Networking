@@ -5,6 +5,7 @@ F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netst
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\LiteNetLib.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\Microsoft.Bcl.AsyncInterfaces.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\Newtonsoft.Json.dll
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\SharpOpenNat.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\System.Buffers.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\System.Memory.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\System.Numerics.Vectors.dll
@@ -22,4 +23,3 @@ F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netst
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.xml
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.pdb
-F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\SharpOpenNat.dll

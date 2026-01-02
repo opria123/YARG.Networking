@@ -154,12 +154,12 @@
         </member>
         <member name="T:YARG.Net.Directory.ILobbyDirectoryClient">
             <summary>
-            Client interface for querying available lobbies from the introducer service.
+            Client interface for querying available lobbies from the lobby server service.
             </summary>
         </member>
         <member name="E:YARG.Net.Directory.ILobbyDirectoryClient.LobbiesChanged">
             <summary>
-            Raised when the lobby list has been refreshed from the introducer.
+            Raised when the lobby list has been refreshed from the lobby server.
             </summary>
         </member>
         <member name="P:YARG.Net.Directory.ILobbyDirectoryClient.Lobbies">
@@ -169,7 +169,7 @@
         </member>
         <member name="M:YARG.Net.Directory.ILobbyDirectoryClient.StartPolling(System.TimeSpan)">
             <summary>
-            Starts periodic polling of the introducer service.
+            Starts periodic polling of the lobby server service.
             </summary>
         </member>
         <member name="M:YARG.Net.Directory.ILobbyDirectoryClient.StopPolling">
@@ -189,27 +189,27 @@
         </member>
         <member name="T:YARG.Net.Directory.LobbyAdvertisementRequest">
             <summary>
-            Payload sent by hosts to advertise their lobby to the introducer service.
+            Payload sent by hosts to advertise their lobby to the lobby server service.
             </summary>
         </member>
         <member name="M:YARG.Net.Directory.LobbyAdvertisementRequest.#ctor(System.Guid,System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Boolean,System.String)">
             <summary>
-            Payload sent by hosts to advertise their lobby to the introducer service.
+            Payload sent by hosts to advertise their lobby to the lobby server service.
             </summary>
         </member>
         <member name="T:YARG.Net.Directory.LobbyDirectoryEntry">
             <summary>
-            Lobby entry returned to clients when querying the introducer.
+            Lobby entry returned to clients when querying the lobby server.
             </summary>
         </member>
         <member name="M:YARG.Net.Directory.LobbyDirectoryEntry.#ctor(System.Guid,System.String,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Boolean,System.String,System.DateTimeOffset)">
             <summary>
-            Lobby entry returned to clients when querying the introducer.
+            Lobby entry returned to clients when querying the lobby server.
             </summary>
         </member>
         <member name="T:YARG.Net.Directory.ILobbyAdvertiser">
             <summary>
-            Client interface for advertising a lobby to the introducer service.
+            Client interface for advertising a lobby to the lobby server service.
             </summary>
         </member>
         <member name="P:YARG.Net.Directory.ILobbyAdvertiser.IsAdvertising">
@@ -234,14 +234,14 @@
         </member>
         <member name="T:YARG.Net.Directory.LobbyAdvertiser">
             <summary>
-            HTTP-based client for advertising lobbies to the introducer service.
+            HTTP-based client for advertising lobbies to the lobby server service.
             </summary>
         </member>
         <member name="M:YARG.Net.Directory.LobbyAdvertiser.#ctor(System.Uri,System.Net.Http.HttpClient)">
             <summary>
             Creates a new lobby advertiser.
             </summary>
-            <param name="introducerBaseUri">Base URI of the introducer service.</param>
+            <param name="introducerBaseUri">Base URI of the lobby server service.</param>
             <param name="httpClient">Optional HttpClient instance.</param>
         </member>
         <member name="P:YARG.Net.Directory.LobbyAdvertiser.IsAdvertising">
@@ -261,7 +261,7 @@
         </member>
         <member name="T:YARG.Net.Directory.LobbyDirectoryClient">
             <summary>
-            HTTP-based client for polling the lobby directory/introducer service.
+            HTTP-based client for polling the lobby directory/lobby server service.
             </summary>
         </member>
         <member name="E:YARG.Net.Directory.LobbyDirectoryClient.LobbiesChanged">
@@ -269,9 +269,9 @@
         </member>
         <member name="M:YARG.Net.Directory.LobbyDirectoryClient.#ctor(System.Uri,System.Nullable{System.TimeSpan},System.Net.Http.HttpClient)">
             <summary>
-            Creates a new directory client pointing at the given introducer endpoint.
+            Creates a new directory client pointing at the given lobby server endpoint.
             </summary>
-            <param name="directoryUri">Base URI of the introducer's lobby list endpoint.</param>
+            <param name="directoryUri">Base URI of the lobby server's lobby list endpoint.</param>
             <param name="lobbyTtl">How long a lobby should be considered active after its last heartbeat.</param>
             <param name="httpClient">Optional HttpClient instance (for testing or reuse).</param>
         </member>
@@ -292,7 +292,7 @@
         </member>
         <member name="T:YARG.Net.Directory.NatPunchClient">
             <summary>
-            Client for NAT punch-through coordination with the introducer service.
+            Client for NAT punch-through coordination with the lobby server service.
             Uses HTTP for signaling and LiteNetLib's NatPunchModule for the actual UDP hole punching.
             </summary>
         </member>
@@ -320,12 +320,12 @@
             <summary>
             Creates a new NAT punch client.
             </summary>
-            <param name="introducerBaseUri">Base URI of the introducer service (e.g., https://lobby.yarg.in)</param>
+            <param name="introducerBaseUri">Base URI of the lobby server service (e.g., https://lobby.yarg.in)</param>
             <param name="httpClient">Optional HttpClient for HTTP requests</param>
         </member>
         <member name="M:YARG.Net.Directory.NatPunchClient.GetPunchServerInfoAsync(System.Threading.CancellationToken)">
             <summary>
-            Gets information about the introducer's NAT punch server.
+            Gets information about the lobby server's NAT punch server.
             </summary>
         </member>
         <member name="M:YARG.Net.Directory.NatPunchClient.Start(System.Int32)">
@@ -372,12 +372,12 @@
         </member>
         <member name="T:YARG.Net.Directory.PunchServerInfo">
             <summary>
-            Information about the introducer's NAT punch server.
+            Information about the lobby server's NAT punch server.
             </summary>
         </member>
         <member name="M:YARG.Net.Directory.PunchServerInfo.#ctor(System.Boolean,System.String,System.Int32,System.String)">
             <summary>
-            Information about the introducer's NAT punch server.
+            Information about the lobby server's NAT punch server.
             </summary>
         </member>
         <member name="T:YARG.Net.Directory.PunchRegisterRequest">
@@ -719,29 +719,29 @@
             Handles lobby-related commands sent by clients (ready toggles, song selection).
             </summary>
         </member>
-        <member name="T:YARG.Net.Introducer.LobbyCodeClient">
+        <member name="T:YARG.Net.LobbyServer.LobbyCodeClient">
             <summary>
-            Client for interacting with introducer lobby code endpoints.
+            Client for interacting with lobby server lobby code endpoints.
             Lobby codes are 6-character hex strings that allow players to easily join lobbies.
             </summary>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.#ctor">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.#ctor">
             <summary>
             Creates a new LobbyCodeClient with the default HttpClient.
             </summary>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.#ctor(System.Net.Http.HttpClient)">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.#ctor(System.Net.Http.HttpClient)">
             <summary>
             Creates a new LobbyCodeClient with a shared HttpClient.
             </summary>
             <param name="httpClient">The HttpClient to use. Will not be disposed by this client.</param>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.RegisterLobbyAsync(System.String,System.Guid,System.String,System.String,System.String,System.Int32,System.Int32,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.RegisterLobbyAsync(System.String,System.Guid,System.String,System.String,System.String,System.Int32,System.Int32,System.Boolean,System.Threading.CancellationToken)">
             <summary>
-            Registers a lobby with the introducer service.
+            Registers a lobby with the lobby server.
             This must be called before generating a code for the lobby.
             </summary>
-            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyServerUrl">The base URL of the lobby server.</param>
             <param name="lobbyId">The lobby ID.</param>
             <param name="lobbyName">The display name of the lobby.</param>
             <param name="hostName">The host's display name.</param>
@@ -752,24 +752,24 @@
             <param name="cancellationToken">Cancellation token.</param>
             <returns>True if registration succeeded.</returns>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.GenerateCodeAsync(System.String,System.Guid,System.Threading.CancellationToken)">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.GenerateCodeAsync(System.String,System.Guid,System.Threading.CancellationToken)">
             <summary>
             Generates a lobby code for the specified lobby.
             If the lobby already has a code, the existing code is returned.
             Note: The lobby must be registered first via RegisterLobbyAsync.
             </summary>
-            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyServerUrl">The base URL of the lobby server.</param>
             <param name="lobbyId">The lobby ID to generate a code for.</param>
             <param name="cancellationToken">Cancellation token.</param>
             <returns>The generated (or existing) lobby code result.</returns>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.RegisterCodeAsync(System.String,System.String,System.Guid,System.String,System.Int32,System.Threading.CancellationToken)">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.RegisterCodeAsync(System.String,System.String,System.Guid,System.String,System.Int32,System.Threading.CancellationToken)">
             <summary>
-            Registers an existing lobby code with an introducer.
-            This is used to disseminate a code generated by another introducer
-            so players using different introducers can still find each other.
+            Registers an existing lobby code with a lobby server.
+            This is used to disseminate a code generated by another lobby server
+            so players using different lobby servers can still find each other.
             </summary>
-            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyServerUrl">The base URL of the lobby server.</param>
             <param name="code">The 6-character lobby code to register.</param>
             <param name="lobbyId">The lobby ID this code maps to.</param>
             <param name="hostAddress">The public IP address of the host.</param>
@@ -777,37 +777,37 @@
             <param name="cancellationToken">Cancellation token.</param>
             <returns>True if the code was registered successfully.</returns>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.LookupCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.LookupCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
             <summary>
             Looks up a lobby by its code.
             </summary>
-            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyServerUrl">The base URL of the lobby server.</param>
             <param name="code">The 6-character lobby code.</param>
             <param name="cancellationToken">Cancellation token.</param>
             <returns>The lobby lookup result.</returns>
         </member>
-        <member name="M:YARG.Net.Introducer.LobbyCodeClient.ReleaseCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
+        <member name="M:YARG.Net.LobbyServer.LobbyCodeClient.ReleaseCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
             <summary>
             Releases a lobby code.
             </summary>
-            <param name="introducerUrl">The base URL of the introducer service.</param>
+            <param name="lobbyServerUrl">The base URL of the lobby server.</param>
             <param name="code">The 6-character lobby code to release.</param>
             <param name="cancellationToken">Cancellation token.</param>
             <returns>True if the code was released, false otherwise.</returns>
         </member>
-        <member name="T:YARG.Net.Introducer.LobbyCodeResult">
+        <member name="T:YARG.Net.LobbyServer.LobbyCodeResult">
             <summary>
             Result of a lobby code generation request.
             </summary>
         </member>
-        <member name="T:YARG.Net.Introducer.LobbyLookupResult">
+        <member name="T:YARG.Net.LobbyServer.LobbyLookupResult">
             <summary>
             Result of a lobby code lookup request.
             </summary>
         </member>
-        <member name="P:YARG.Net.Introducer.LobbyLookupResult.IntroducerUrl">
+        <member name="P:YARG.Net.LobbyServer.LobbyLookupResult.LobbyServerUrl">
             <summary>
-            The introducer URL that was used for the successful lookup.
+            The lobby server URL that was used for the successful lookup.
             Used for NAT punch coordination.
             </summary>
         </member>
@@ -2236,6 +2236,241 @@
         <member name="M:YARG.Net.Packets.UnisonBinaryPackets.TryParseBonusAwardPacket(System.ReadOnlySpan{System.Byte},System.Double@)">
             <summary>
             Parses a unison bonus award packet (legacy overload, ignores bandId).
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.LiteNetRelayClient">
+            <summary>
+            LiteNetLib-based relay client for connecting through a relay server.
+            Used when direct P2P connections are not possible.
+            Both host and client use this to connect to the relay server.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Relay.LiteNetRelayClient.OnDataReceived">
+            <summary>Event fired when data is received from the other peer via relay.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.LiteNetRelayClient.OnRegistered">
+            <summary>Event fired when registered with the relay server.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.LiteNetRelayClient.OnRelayPeerConnected">
+            <summary>Event fired when the other peer connects via relay.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.LiteNetRelayClient.OnRelayPeerDisconnected">
+            <summary>Event fired when the other peer disconnects.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.LiteNetRelayClient.OnDisconnected">
+            <summary>Event fired when disconnected from relay.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.LiteNetRelayClient.OnError">
+            <summary>Event fired on errors.</summary>
+        </member>
+        <member name="P:YARG.Net.Relay.LiteNetRelayClient.IsConnectedToRelay">
+            <summary>Gets whether connected to the relay server.</summary>
+        </member>
+        <member name="P:YARG.Net.Relay.LiteNetRelayClient.IsRegistered">
+            <summary>Gets whether registered with the relay as host/client.</summary>
+        </member>
+        <member name="P:YARG.Net.Relay.LiteNetRelayClient.IsPeerConnected">
+            <summary>Gets whether the other peer is connected via relay.</summary>
+        </member>
+        <member name="P:YARG.Net.Relay.LiteNetRelayClient.IsHost">
+            <summary>Gets whether this client is the host side.</summary>
+        </member>
+        <member name="P:YARG.Net.Relay.LiteNetRelayClient.SessionId">
+            <summary>Gets the session ID.</summary>
+        </member>
+        <member name="M:YARG.Net.Relay.LiteNetRelayClient.#ctor(System.String,System.Int32,System.Guid,System.Boolean)">
+            <summary>
+            Creates a new relay client.
+            </summary>
+            <param name="relayAddress">Relay server address.</param>
+            <param name="relayPort">Relay server port.</param>
+            <param name="sessionId">Session ID from relay allocation.</param>
+            <param name="isHost">True if this is the host side.</param>
+        </member>
+        <member name="M:YARG.Net.Relay.LiteNetRelayClient.ConnectAsync(System.Int32)">
+            <summary>
+            Connects to the relay server and registers as host or client.
+            </summary>
+            <param name="timeoutMs">Connection timeout in milliseconds.</param>
+            <returns>True if connected and registered successfully.</returns>
+        </member>
+        <member name="M:YARG.Net.Relay.LiteNetRelayClient.Send(System.Byte[],LiteNetLib.DeliveryMethod)">
+            <summary>
+            Sends data to the other peer through the relay.
+            </summary>
+            <param name="data">Data to send.</param>
+            <param name="deliveryMethod">Delivery method.</param>
+        </member>
+        <member name="M:YARG.Net.Relay.LiteNetRelayClient.Send(LiteNetLib.Utils.NetDataWriter,LiteNetLib.DeliveryMethod)">
+            <summary>
+            Sends data using a NetDataWriter through the relay.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.LiteNetRelayClient.Disconnect">
+            <summary>
+            Disconnects from the relay.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayClient">
+            <summary>
+            Relay client that communicates through a relay server when direct P2P is not possible.
+            Handles the relay protocol for both hosts and clients.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnDataReceived">
+            <summary>Event fired when data is received from the peer.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnPeerConnected">
+            <summary>Event fired when the other peer connects.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnPeerDisconnected">
+            <summary>Event fired when the other peer disconnects.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnRegistered">
+            <summary>Event fired when registration with the relay succeeds.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnError">
+            <summary>Event fired on errors.</summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayClient.Start">
+            <summary>
+            Starts the relay client and registers with the server.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayClient.Send(System.Byte[])">
+            <summary>
+            Sends data through the relay to the peer.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayClient.Disconnect">
+            <summary>
+            Sends a disconnect notification and stops the client.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayPacketType">
+            <summary>
+            Types of relay control packets. Must match server-side enum.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayConnection">
+            <summary>
+            Wraps a LiteNetRelayClient to present it as an INetConnection.
+            This allows the relay to be used transparently by the networking layer.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnection.#ctor(YARG.Net.Relay.LiteNetRelayClient)">
+            <summary>
+            Creates a new relay connection wrapper.
+            </summary>
+            <param name="relayClient">The underlying relay client.</param>
+        </member>
+        <member name="P:YARG.Net.Relay.RelayConnection.Id">
+            <summary>
+            Gets the unique connection ID.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Relay.RelayConnection.EndPoint">
+            <summary>
+            Gets the endpoint description (relay server info).
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Relay.RelayConnection.RelayClient">
+            <summary>
+            Gets the underlying relay client.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnection.Disconnect(System.String)">
+            <summary>
+            Disconnects from the relay.
+            </summary>
+            <param name="reason">Optional disconnect reason.</param>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnection.Send(System.ReadOnlySpan{System.Byte},YARG.Net.Transport.ChannelType)">
+            <summary>
+            Sends data through the relay to the other peer.
+            </summary>
+            <param name="payload">Data to send.</param>
+            <param name="channel">Channel type (mapped to LiteNetLib delivery method).</param>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayConnectionManager">
+            <summary>
+            Manages relay connections for when direct P2P is not possible.
+            This is the main entry point for the relay system.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnDataReceived">
+            <summary>Event fired when data is received from the peer.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnConnected">
+            <summary>Event fired when connected via relay.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnDisconnected">
+            <summary>Event fired when disconnected.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnError">
+            <summary>Event fired on errors.</summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.IsRelayAvailableAsync(System.Threading.CancellationToken)">
+            <summary>
+            Checks if the relay server is available.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.StartHostRelayAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Allocates a relay session and starts the host side of the connection.
+            Call this when hosting a lobby that needs relay.
+            </summary>
+            <param name="lobbyId">The lobby ID to create a relay for.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>The relay session info, or null if allocation failed.</returns>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.ConnectViaRelayAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Connects to a lobby via relay as a client.
+            </summary>
+            <param name="lobbyId">The lobby ID to connect to.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>True if connection initiated successfully.</returns>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.Send(System.Byte[])">
+            <summary>
+            Sends data through the relay to the peer.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.DisconnectAsync">
+            <summary>
+            Disconnects from the relay.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayHttpClient">
+            <summary>
+            HTTP client for interacting with the relay server's REST API.
+            Handles session allocation and management.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayHttpClient.GetRelayInfoAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets information about the relay server.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayHttpClient.AllocateSessionAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Allocates a relay session for a lobby.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayHttpClient.ReleaseSessionAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Releases a relay session.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayInfo">
+            <summary>
+            Relay server info returned by /api/relay/info
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayAllocation">
+            <summary>
+            Relay session allocation result from /api/relay/allocate
             </summary>
         </member>
         <member name="T:YARG.Net.Runtime.ClientNetworkingBootstrapper">
@@ -3858,6 +4093,7 @@
         <member name="T:YARG.Net.Utilities.UPnP.UPnPClient">
             <summary>
             Client for UPnP (Universal Plug and Play) port mapping operations.
+            Uses SharpOpenNat for robust router compatibility.
             Enables automatic port forwarding on supported routers.
             </summary>
         </member>
@@ -3881,7 +4117,7 @@
             <summary>
             Creates a new UPnP client.
             </summary>
-            <param name="discoveryTimeout">Timeout for device discovery. Default is 3 seconds.</param>
+            <param name="discoveryTimeout">Timeout for device discovery. Default is 5 seconds.</param>
         </member>
         <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.DiscoverAsync(System.Threading.CancellationToken)">
             <summary>
@@ -3913,6 +4149,13 @@
             </summary>
             <param name="cancellationToken">Cancellation token.</param>
             <returns>The external IP address, or null if unavailable.</returns>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.GetAllMappingsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Lists all port mappings on the gateway device.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of all port mappings, or empty list on error.</returns>
         </member>
         <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.GetPortMappingAsync(System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
             <summary>
@@ -3948,23 +4191,6 @@
             Exception thrown for UPnP-specific errors.
             </summary>
         </member>
-        <member name="T:YARG.Net.Utilities.UPnP.UPnPDiscovery">
-            <summary>
-            Handles SSDP (Simple Service Discovery Protocol) discovery of UPnP devices.
-            </summary>
-        </member>
-        <member name="M:YARG.Net.Utilities.UPnP.UPnPDiscovery.DiscoverAsync(System.TimeSpan,System.Threading.CancellationToken)">
-            <summary>
-            Discovers a UPnP gateway device on the local network.
-            </summary>
-        </member>
-        <member name="M:YARG.Net.Utilities.UPnP.UPnPDiscovery.GetLocalLanAddress">
-            <summary>
-            Gets the local LAN IP address by determining which interface would be used
-            to reach a public address. This ensures we bind to the correct interface
-            on systems with multiple network adapters.
-            </summary>
-        </member>
         <member name="T:YARG.Net.Utilities.UPnP.UPnPDevice">
             <summary>
             Represents a discovered UPnP device.
@@ -3973,31 +4199,6 @@
         <member name="M:YARG.Net.Utilities.UPnP.UPnPDevice.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Represents a discovered UPnP device.
-            </summary>
-        </member>
-        <member name="T:YARG.Net.Utilities.UPnP.UPnPSoap">
-            <summary>
-            Handles SOAP requests for UPnP port mapping operations.
-            </summary>
-        </member>
-        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.AddPortMappingAsync(YARG.Net.Utilities.UPnP.UPnPDevice,YARG.Net.Utilities.UPnP.PortMapping,System.Threading.CancellationToken)">
-            <summary>
-            Adds a port mapping on the UPnP device.
-            </summary>
-        </member>
-        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.DeletePortMappingAsync(YARG.Net.Utilities.UPnP.UPnPDevice,System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
-            <summary>
-            Deletes a port mapping from the UPnP device.
-            </summary>
-        </member>
-        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.GetExternalIPAddressAsync(YARG.Net.Utilities.UPnP.UPnPDevice,System.Threading.CancellationToken)">
-            <summary>
-            Gets the external IP address from the UPnP device.
-            </summary>
-        </member>
-        <member name="M:YARG.Net.Utilities.UPnP.UPnPSoap.GetSpecificPortMappingAsync(YARG.Net.Utilities.UPnP.UPnPDevice,System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
-            <summary>
-            Gets a specific port mapping entry.
             </summary>
         </member>
         <member name="T:System.Diagnostics.CodeAnalysis.ExperimentalAttribute">

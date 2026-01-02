@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace YARG.Net.Directory;
 
 /// <summary>
-/// Payload sent by hosts to advertise their lobby to the introducer service.
+/// Payload sent by hosts to advertise their lobby to the lobby server service.
 /// </summary>
 public sealed record LobbyAdvertisementRequest(
     [property: JsonPropertyName("lobbyId")] Guid LobbyId,
@@ -18,7 +18,7 @@ public sealed record LobbyAdvertisementRequest(
     [property: JsonPropertyName("version")] string Version);
 
 /// <summary>
-/// Lobby entry returned to clients when querying the introducer.
+/// Lobby entry returned to clients when querying the lobby server.
 /// </summary>
 public sealed record LobbyDirectoryEntry(
     [property: JsonPropertyName("lobbyId")] Guid LobbyId,

@@ -42,3 +42,4 @@ F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.ServerHost\obj\Debug\
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.ServerHost\obj\Debug\net8.0\YARG.ServerHost.pdb
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.ServerHost\obj\Debug\net8.0\YARG.ServerHost.genruntimeconfig.cache
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.ServerHost\obj\Debug\net8.0\ref\YARG.ServerHost.dll
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.ServerHost\bin\Debug\net8.0\SharpOpenNat.dll

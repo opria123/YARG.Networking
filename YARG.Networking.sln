@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARG.Net", "src\YARG.Net\YA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARG.ServerHost", "src\YARG.ServerHost\YARG.ServerHost.csproj", "{6F2C909E-0F73-44A6-A7AF-11FEA2F0E709}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARG.Introducer", "src\YARG.Introducer\YARG.Introducer.csproj", "{AE6B8DA8-5618-4A60-A559-C1923112ADA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARG.LobbyServer", "src\YARG.LobbyServer\YARG.LobbyServer.csproj", "{AE6B8DA8-5618-4A60-A559-C1923112ADA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YARG.Net.Tests", "tests\YARG.Net.Tests\YARG.Net.Tests.csproj", "{9AC7A4E2-5CDD-48C8-8D97-8C6F9DEBDBD8}"
 EndProject

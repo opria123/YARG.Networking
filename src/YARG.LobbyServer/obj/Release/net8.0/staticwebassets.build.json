@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "VdrbfKB+89gXv7IQ9oZnfwg/tFQYAESbVqZD8yTtwOE=",
+  "Source": "YARG.LobbyServer",
+  "BasePath": "_content/YARG.LobbyServer",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -7,7 +7,7 @@ app = 'yarg-introducer'
 primary_region = 'iad'
 
 [build]
-  dockerfile = 'src/YARG.Introducer/Dockerfile'
+  dockerfile = 'src/YARG.LobbyServer/Dockerfile'
 
 [env]
   ASPNETCORE_URLS = 'http://+:8080'

@@ -208,3 +208,4 @@ F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\bin\Relea
 F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.DA8AEF3F.Up2Date
 F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\YARG.Net.Tests.genruntimeconfig.cache
 F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\obj\Release\net8.0\ref\YARG.Net.Tests.dll
+F:\projects\YARG-development\YARG\YARG.Networking\tests\YARG.Net.Tests\bin\Release\net8.0\SharpOpenNat.dll

@@ -16,9 +16,9 @@ public sealed class RelayHttpClient : IDisposable
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
     
-    public RelayHttpClient(string introducerUrl)
+    public RelayHttpClient(string lobbyServerUrl)
     {
-        _baseUrl = introducerUrl.TrimEnd('/');
+        _baseUrl = lobbyServerUrl.TrimEnd('/');
         _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromSeconds(10)

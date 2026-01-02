@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YARG.ServerHost")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5444699a6f1e422e5ab98c6d4dfebcbd6f8633dd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66baf10ea0439b87aaef3254ae6e9f95b8cfab40")]
 [assembly: System.Reflection.AssemblyProductAttribute("YARG.ServerHost")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YARG.ServerHost")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

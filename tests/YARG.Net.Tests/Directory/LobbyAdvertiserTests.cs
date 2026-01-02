@@ -11,7 +11,7 @@ namespace YARG.Net.Tests.Directory;
 
 public class LobbyAdvertiserTests
 {
-    private readonly Uri _introducerUri = new("http://localhost:8080/api/lobbies");
+    private readonly Uri _lobbyServerUri = new("http://localhost:8080/api/lobbies");
 
     [Fact]
     public void Constructor_WithNullUri_ThrowsArgumentNullException()
@@ -24,7 +24,7 @@ public class LobbyAdvertiserTests
     public void IsAdvertising_WhenNotStarted_ReturnsFalse()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
 
         // Act & Assert
         Assert.False(sut.IsAdvertising);
@@ -34,7 +34,7 @@ public class LobbyAdvertiserTests
     public void StartAdvertising_WithNullRequest_ThrowsArgumentNullException()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => sut.StartAdvertising(null!, TimeSpan.FromSeconds(10)));
@@ -44,7 +44,7 @@ public class LobbyAdvertiserTests
     public void StartAdvertising_WhenCalled_SetsIsAdvertisingTrue()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
         var request = CreateSampleRequest();
 
         // Act
@@ -58,7 +58,7 @@ public class LobbyAdvertiserTests
     public void StartAdvertising_WhenAlreadyAdvertising_ThrowsInvalidOperationException()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
         var request = CreateSampleRequest();
         sut.StartAdvertising(request, TimeSpan.FromMinutes(5));
 
@@ -70,7 +70,7 @@ public class LobbyAdvertiserTests
     public async Task StopAdvertisingAsync_WhenNotAdvertising_DoesNotThrow()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
 
         // Act - should not throw
         await sut.StopAdvertisingAsync();
@@ -83,7 +83,7 @@ public class LobbyAdvertiserTests
     public async Task StopAdvertisingAsync_WhenAdvertising_SetsIsAdvertisingFalse()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
         var request = CreateSampleRequest();
         sut.StartAdvertising(request, TimeSpan.FromMinutes(5));
 
@@ -98,7 +98,7 @@ public class LobbyAdvertiserTests
     public void UpdateAdvertisement_WithNullRequest_ThrowsArgumentNullException()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => sut.UpdateAdvertisement(null!));
@@ -108,7 +108,7 @@ public class LobbyAdvertiserTests
     public void UpdateAdvertisement_WhenNotAdvertising_DoesNotThrow()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
         var request = CreateSampleRequest();
 
         // Act - should not throw
@@ -122,7 +122,7 @@ public class LobbyAdvertiserTests
     public void Dispose_WhenAdvertising_StopsAdvertising()
     {
         // Arrange
-        var sut = new LobbyAdvertiser(_introducerUri);
+        var sut = new LobbyAdvertiser(_lobbyServerUri);
         var request = CreateSampleRequest();
         sut.StartAdvertising(request, TimeSpan.FromMinutes(5));
 
@@ -137,7 +137,7 @@ public class LobbyAdvertiserTests
     public void Dispose_MultipleCalls_DoesNotThrow()
     {
         // Arrange
-        var sut = new LobbyAdvertiser(_introducerUri);
+        var sut = new LobbyAdvertiser(_lobbyServerUri);
 
         // Act - should not throw
         sut.Dispose();
@@ -151,7 +151,7 @@ public class LobbyAdvertiserTests
     public async Task StopAdvertisingAsync_WithCancelledToken_StopsSuccessfullyIfNotAdvertising()
     {
         // Arrange
-        using var sut = new LobbyAdvertiser(_introducerUri);
+        using var sut = new LobbyAdvertiser(_lobbyServerUri);
         var cts = new CancellationTokenSource();
         cts.Cancel();
 

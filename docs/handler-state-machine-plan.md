@@ -158,4 +158,4 @@ _Last updated: 2025-02-28_
 ## Open Questions
 - Should session IDs persist across reconnects or reset per transport connection? (Currently planning per-connection new GUID.)
 - Where should password/whitelist rules live? (Likely `ServerRuntimeOptions`.)
-- Need to decide how invites map to `SessionId` vs. arbitrary codes for future introducer service.
+- Need to decide how invites map to `SessionId` vs. arbitrary codes for future lobby server.

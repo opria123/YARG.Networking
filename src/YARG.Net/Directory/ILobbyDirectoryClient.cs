@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 namespace YARG.Net.Directory;
 
 /// <summary>
-/// Client interface for querying available lobbies from the introducer service.
+/// Client interface for querying available lobbies from the lobby server service.
 /// </summary>
 public interface ILobbyDirectoryClient : IDisposable
 {
     /// <summary>
-    /// Raised when the lobby list has been refreshed from the introducer.
+    /// Raised when the lobby list has been refreshed from the lobby server.
     /// </summary>
     event EventHandler<LobbyDirectoryChangedEventArgs>? LobbiesChanged;
 
@@ -21,7 +21,7 @@ public interface ILobbyDirectoryClient : IDisposable
     IReadOnlyList<LobbyDirectoryEntry> Lobbies { get; }
 
     /// <summary>
-    /// Starts periodic polling of the introducer service.
+    /// Starts periodic polling of the lobby server service.
     /// </summary>
     void StartPolling(TimeSpan interval);
 

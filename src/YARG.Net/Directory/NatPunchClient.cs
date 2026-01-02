@@ -11,7 +11,7 @@ using LiteNetLib;
 namespace YARG.Net.Directory;
 
 /// <summary>
-/// Client for NAT punch-through coordination with the introducer service.
+/// Client for NAT punch-through coordination with the lobby server service.
 /// Uses HTTP for signaling and LiteNetLib's NatPunchModule for the actual UDP hole punching.
 /// </summary>
 public sealed class NatPunchClient : IDisposable, INatPunchListener
@@ -53,7 +53,7 @@ public sealed class NatPunchClient : IDisposable, INatPunchListener
     /// <summary>
     /// Creates a new NAT punch client.
     /// </summary>
-    /// <param name="introducerBaseUri">Base URI of the introducer service (e.g., https://lobby.yarg.in)</param>
+    /// <param name="introducerBaseUri">Base URI of the lobby server service (e.g., https://lobby.yarg.in)</param>
     /// <param name="httpClient">Optional HttpClient for HTTP requests</param>
     public NatPunchClient(Uri introducerBaseUri, HttpClient? httpClient = null)
     {
@@ -63,7 +63,7 @@ public sealed class NatPunchClient : IDisposable, INatPunchListener
     }
     
     /// <summary>
-    /// Gets information about the introducer's NAT punch server.
+    /// Gets information about the lobby server's NAT punch server.
     /// </summary>
     public async Task<PunchServerInfo> GetPunchServerInfoAsync(CancellationToken ct = default)
     {
@@ -320,7 +320,7 @@ public sealed class NatPunchClient : IDisposable, INatPunchListener
 // DTOs for HTTP communication
 
 /// <summary>
-/// Information about the introducer's NAT punch server.
+/// Information about the lobby server's NAT punch server.
 /// </summary>
 public record PunchServerInfo(bool Available, string? Address, int Port, string Message);
 

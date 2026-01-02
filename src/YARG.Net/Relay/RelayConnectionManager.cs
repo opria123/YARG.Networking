@@ -10,7 +10,7 @@ namespace YARG.Net.Relay;
 /// </summary>
 public sealed class RelayConnectionManager : IDisposable
 {
-    private readonly string _introducerUrl;
+    private readonly string _lobbyServerUrl;
     private RelayHttpClient? _httpClient;
     private RelayClient? _relayClient;
     private Guid _currentSessionId;
@@ -32,9 +32,9 @@ public sealed class RelayConnectionManager : IDisposable
     public bool IsRelayActive => _relayClient != null && _relayClient.IsRegistered;
     public Guid SessionId => _currentSessionId;
     
-    public RelayConnectionManager(string introducerUrl)
+    public RelayConnectionManager(string lobbyServerUrl)
     {
-        _introducerUrl = introducerUrl;
+        _lobbyServerUrl = lobbyServerUrl;
     }
     
     /// <summary>
@@ -42,7 +42,7 @@ public sealed class RelayConnectionManager : IDisposable
     /// </summary>
     public async Task<bool> IsRelayAvailableAsync(CancellationToken ct = default)
     {
-        _httpClient ??= new RelayHttpClient(_introducerUrl);
+        _httpClient ??= new RelayHttpClient(_lobbyServerUrl);
         
         var info = await _httpClient.GetRelayInfoAsync(ct);
         return info?.Available ?? false;
@@ -57,7 +57,7 @@ public sealed class RelayConnectionManager : IDisposable
     /// <returns>The relay session info, or null if allocation failed.</returns>
     public async Task<RelayAllocation?> StartHostRelayAsync(Guid lobbyId, CancellationToken ct = default)
     {
-        _httpClient ??= new RelayHttpClient(_introducerUrl);
+        _httpClient ??= new RelayHttpClient(_lobbyServerUrl);
         
         var allocation = await _httpClient.AllocateSessionAsync(lobbyId, ct);
         if (allocation == null || !allocation.Success)
@@ -96,7 +96,7 @@ public sealed class RelayConnectionManager : IDisposable
     /// <returns>True if connection initiated successfully.</returns>
     public async Task<bool> ConnectViaRelayAsync(Guid lobbyId, CancellationToken ct = default)
     {
-        _httpClient ??= new RelayHttpClient(_introducerUrl);
+        _httpClient ??= new RelayHttpClient(_lobbyServerUrl);
         
         // Client also allocates (which returns the existing session for the lobby)
         var allocation = await _httpClient.AllocateSessionAsync(lobbyId, ct);

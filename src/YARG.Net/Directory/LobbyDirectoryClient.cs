@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace YARG.Net.Directory;
 
 /// <summary>
-/// HTTP-based client for polling the lobby directory/introducer service.
+/// HTTP-based client for polling the lobby directory/lobby server service.
 /// </summary>
 public sealed class LobbyDirectoryClient : ILobbyDirectoryClient
 {
@@ -31,9 +31,9 @@ public sealed class LobbyDirectoryClient : ILobbyDirectoryClient
     public event EventHandler<LobbyDirectoryChangedEventArgs>? LobbiesChanged;
 
     /// <summary>
-    /// Creates a new directory client pointing at the given introducer endpoint.
+    /// Creates a new directory client pointing at the given lobby server endpoint.
     /// </summary>
-    /// <param name="directoryUri">Base URI of the introducer's lobby list endpoint.</param>
+    /// <param name="directoryUri">Base URI of the lobby server's lobby list endpoint.</param>
     /// <param name="lobbyTtl">How long a lobby should be considered active after its last heartbeat.</param>
     /// <param name="httpClient">Optional HttpClient instance (for testing or reuse).</param>
     public LobbyDirectoryClient(Uri directoryUri, TimeSpan? lobbyTtl = null, HttpClient? httpClient = null)

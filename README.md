@@ -8,7 +8,7 @@ Networking logic and server runtimes for YARG online multiplayer. This repo host
 | --- | --- | --- |
 | `YARG.Net` | `netstandard2.1` | Shared abstractions plus the concrete LiteNetLib transport that Unity and server hosts reference. |
 | `YARG.ServerHost` | `net8.0` | Console application that boots the LiteNetLib transport via the default server runtime. |
-| `YARG.Introducer` | `net8.0` | Future introducer / relay control plane for NAT traversal. |
+| `YARG.LobbyServer` | `net8.0` | Lobby directory, NAT punch coordination, and relay server for multiplayer connections. |
 | `YARG.Net.Tests` | `net8.0` | xUnit test suite that exercises the shared library with transport shims. |
 
 The root `YARG.Networking.sln` loads all of the projects above. Shared SDK settings live in `Directory.Build.props`.
