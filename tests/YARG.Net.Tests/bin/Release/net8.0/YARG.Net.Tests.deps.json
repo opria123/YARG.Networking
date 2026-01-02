@@ -9,6 +9,7 @@
       "YARG.Net.Tests/1.0.0": {
         "dependencies": {
           "Microsoft.NET.Test.Sdk": "17.10.0",
+          "System.Text.Json": "8.0.5",
           "YARG.Net": "1.0.0",
           "coverlet.collector": "6.0.0",
           "xunit": "2.7.0",

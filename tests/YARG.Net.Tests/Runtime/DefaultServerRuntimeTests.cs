@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using YARG.Net.Runtime;
 using YARG.Net.Transport;
@@ -14,16 +15,15 @@ public sealed class DefaultServerRuntimeTests
         var runtime = new DefaultServerRuntime(TimeSpan.FromMilliseconds(1));
         using var transport = new NullTransport();
 
-        runtime.Configure(new ServerRuntimeOptions
+        runtime.Configure(new ServerRuntimeOptions(transport)
         {
-            Transport = transport,
             Port = 9000,
         });
 
         await runtime.StartAsync();
         Assert.True(transport.IsRunning);
 
-        await runtime.StopAsync();
+        await runtime.StopAsync(null, CancellationToken.None);
         Assert.False(transport.IsRunning);
     }
 
@@ -33,9 +33,8 @@ public sealed class DefaultServerRuntimeTests
         var runtime = new DefaultServerRuntime(TimeSpan.FromMilliseconds(1));
         using var transport = new NullTransport();
 
-        runtime.Configure(new ServerRuntimeOptions
+        runtime.Configure(new ServerRuntimeOptions(transport)
         {
-            Transport = transport,
             Port = 9001,
         });
 
@@ -44,11 +43,11 @@ public sealed class DefaultServerRuntimeTests
         var newTransport = new NullTransport();
         try
         {
-            Assert.Throws<InvalidOperationException>(() => runtime.Configure(new ServerRuntimeOptions { Transport = newTransport }));
+            Assert.Throws<InvalidOperationException>(() => runtime.Configure(new ServerRuntimeOptions(newTransport)));
         }
         finally
         {
-            await runtime.StopAsync();
+            await runtime.StopAsync(null, CancellationToken.None);
             newTransport.Dispose();
         }
     }

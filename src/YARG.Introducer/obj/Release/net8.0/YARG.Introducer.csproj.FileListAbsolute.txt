@@ -60,3 +60,4 @@ F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Releas
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Release\net8.0\YARG.Int.607A7685.Up2Date
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Release\net8.0\YARG.Introducer.genruntimeconfig.cache
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Release\net8.0\ref\YARG.Introducer.dll
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\bin\Release\net8.0\SharpOpenNat.dll

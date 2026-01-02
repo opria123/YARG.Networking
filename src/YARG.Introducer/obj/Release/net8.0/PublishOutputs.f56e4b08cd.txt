@@ -1,0 +1,10 @@
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Introducer.exe
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Introducer.dll
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Introducer.deps.json
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Introducer.runtimeconfig.json
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Introducer.pdb
+F:\projects\YARG-development\YARG\YARG.Networking\publish\LiteNetLib.dll
+F:\projects\YARG-development\YARG\YARG.Networking\publish\Newtonsoft.Json.dll
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Net.dll
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Net.pdb
+F:\projects\YARG-development\YARG\YARG.Networking\publish\YARG.Net.xml

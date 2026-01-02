@@ -237,7 +237,8 @@ namespace YARG.Net.Introducer
 
                     if (entry != null)
                     {
-                        return LobbyLookupResult.Success(entry);
+                        // Pass the introducer URL for NAT punch coordination
+                        return LobbyLookupResult.Success(entry, introducerUrl);
                     }
                 }
 
@@ -378,16 +379,23 @@ namespace YARG.Net.Introducer
         public bool IsSuccess { get; }
         public LobbyDirectoryEntry? Lobby { get; }
         public string? Error { get; }
+        
+        /// <summary>
+        /// The introducer URL that was used for the successful lookup.
+        /// Used for NAT punch coordination.
+        /// </summary>
+        public string? IntroducerUrl { get; }
 
-        private LobbyLookupResult(bool isSuccess, LobbyDirectoryEntry? lobby, string? error)
+        private LobbyLookupResult(bool isSuccess, LobbyDirectoryEntry? lobby, string? error, string? introducerUrl = null)
         {
             IsSuccess = isSuccess;
             Lobby = lobby;
             Error = error;
+            IntroducerUrl = introducerUrl;
         }
 
-        public static LobbyLookupResult Success(LobbyDirectoryEntry lobby) =>
-            new(true, lobby, null);
+        public static LobbyLookupResult Success(LobbyDirectoryEntry lobby, string? introducerUrl = null) =>
+            new(true, lobby, null, introducerUrl);
 
         public static LobbyLookupResult Failure(string error) =>
             new(false, null, error);

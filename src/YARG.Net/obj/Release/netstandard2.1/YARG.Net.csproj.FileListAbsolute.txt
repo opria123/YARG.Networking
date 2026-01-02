@@ -22,3 +22,4 @@ F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netst
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.dll
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.xml
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\obj\Release\netstandard2.1\YARG.Net.pdb
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Net\bin\Release\netstandard2.1\SharpOpenNat.dll

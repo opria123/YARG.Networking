@@ -16,7 +16,8 @@ internal sealed class LiteNetLibConnection : INetConnection
 
     public Guid Id => _id;
 
-    public string EndPoint => _peer.EndPoint?.ToString() ?? string.Empty;
+    // In LiteNetLib 1.2+, NetPeer derives from IPEndPoint so we use it directly
+    public string EndPoint => _peer.ToString();
 
     public void Disconnect(string? reason = null)
     {

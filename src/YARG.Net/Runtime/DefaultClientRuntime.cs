@@ -166,6 +166,7 @@ public sealed class DefaultClientRuntime : IClientRuntime
                 Address = address,
                 Port = port,
                 IsServer = false,
+                EnableNatPunchThrough = true, // Enable NAT punch-through for better connectivity
             });
         }
         catch

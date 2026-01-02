@@ -1,0 +1,14 @@
+# Fly.io / Docker ignore file
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/node_modules/
+**/*.user
+**/*.suo
+**/TestResults/
+**/.git/
+**/.github/
+**/docs/
+**/*.md
+!README.md

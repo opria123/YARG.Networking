@@ -6,11 +6,28 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>Core networking abstractions for YARG.</Description>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- Path to Unity Plugins folder (relative to this csproj) -->
+    <UnityPluginsPath>$(MSBuildThisFileDirectory)..\..\..\Assets\Plugins\YARG.Net\</UnityPluginsPath>
   </PropertyGroup>
+  
+  <!-- Auto-copy DLLs to Unity after build -->
+  <Target Name="CopyToUnity" AfterTargets="Build" Condition="Exists('$(UnityPluginsPath)')">
+    <ItemGroup>
+      <DllsToCopy Include="$(OutputPath)YARG.Net.dll" />
+      <DllsToCopy Include="$(OutputPath)LiteNetLib.dll" />
+      <DllsToCopy Include="$(OutputPath)Newtonsoft.Json.dll" />
+      <DllsToCopy Include="$(OutputPath)System.Text.Json.dll" />
+      <DllsToCopy Include="$(OutputPath)SharpOpenNat.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DllsToCopy)" DestinationFolder="$(UnityPluginsPath)" SkipUnchangedFiles="true" ContinueOnError="true" />
+    <Message Importance="High" Text="Copied DLLs to Unity: $(UnityPluginsPath)" />
+  </Target>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="LiteNetLib" Version="1.1.0" />
+    <PackageReference Include="LiteNetLib" Version="1.3.5" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <!-- SharpOpenNat for robust UPnP/NAT-PMP port forwarding -->
+    <PackageReference Include="SharpOpenNat" Version="4.0.17" />
     <!-- PolySharp provides all necessary polyfills for C# 11 features on netstandard2.1 -->
     <PackageReference Include="PolySharp" Version="1.14.1">
       <PrivateAssets>all</PrivateAssets>

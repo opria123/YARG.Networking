@@ -1,0 +1,100 @@
+﻿[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:36:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 0.2364ms
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m][NatPunchServer] NAT introduction request: local=192.168.0.103:9050, remote=142.197.142.28:9050, token=host:b7fb7ac5-0e93-4c09-8516-58818ece7546
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m][NatPunchServer] Host UDP registration for lobby b7fb7ac5-0e93-4c09-8516-58818ece7546: external=142.197.142.28:9050
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m][NatPunchServer] Host registered for lobby b7fb7ac5-0e93-4c09-8516-58818ece7546: internal=192.168.0.103:9050, external=142.197.142.28:9050
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 DELETE http://yarg-introducer.fly.dev/api/lobbies/code/CBBCA3 - - 0
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m][Introducer] Code 'CBBCA3' released for lobby b7fb7ac5-0e93-4c09-8516-58818ece7546
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: DELETE /api/lobbies/code/{code}'
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType3`1' as Json.
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: DELETE /api/lobbies/code/{code}'
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:36:14Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 DELETE http://yarg-introducer.fly.dev/api/lobbies/code/CBBCA3 - 200 - application/json;+charset=utf-8 3.0409ms
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 GET http://172.19.24.242:8080/health - - -
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:36:22Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 1.6161ms
+[2m2026-01-02T02:36:25Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m][NatPunchServer] Punch attempt timed out: b7fb7ac5-0e93-4c09-8516-58818ece7546:abf6065538344c968dd6eeda0a522b57:dbf1cd7f7fbe4ea6bf6ced046eb8f952
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 GET http://172.19.24.242:8080/health - - -
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:36:32Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 2.2697ms
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 GET http://172.19.24.242:8080/health - - -
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:36:42Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 0.7343ms
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 GET http://172.19.24.242:8080/health - - -
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:36:52Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 0.7779ms
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 GET http://172.19.24.242:8080/health - - -
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:37:02Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 0.2005ms
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m][NatPunchServer] UDP Stats: packetsReceived=0, packetsSent=0, bytesReceived=0, bytesSent=0
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request starting HTTP/1.1 GET http://172.19.24.242:8080/health - - -
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executing endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[1]
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Setting HTTP status code 200.
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Http.Result.OkObjectResult[3]
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Writing value of type '<>f__AnonymousType0`4' as Json.
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Executed endpoint 'HTTP: GET /health'
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+[2m2026-01-02T02:37:12Z[0m app[287e557c693368] [32miad[0m [[34minfo[0m]      Request finished HTTP/1.1 GET http://172.19.24.242:8080/health - 200 - application/json;+charset=utf-8 1.3094ms

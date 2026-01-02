@@ -290,6 +290,136 @@
         <member name="M:YARG.Net.Directory.LobbyDirectoryClient.Dispose">
             <inheritdoc />
         </member>
+        <member name="T:YARG.Net.Directory.NatPunchClient">
+            <summary>
+            Client for NAT punch-through coordination with the introducer service.
+            Uses HTTP for signaling and LiteNetLib's NatPunchModule for the actual UDP hole punching.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Directory.NatPunchClient.OnPunchSuccess">
+            <summary>
+            Fired when NAT punch succeeds and a connection endpoint is available.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Directory.NatPunchClient.OnPunchFailed">
+            <summary>
+            Fired when a NAT punch attempt fails or times out.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.NatPunchClient.LocalPort">
+            <summary>
+            Gets the local port being used for punch-through.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Directory.NatPunchClient.IsActive">
+            <summary>
+            Gets whether the punch client is active.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.#ctor(System.Uri,System.Net.Http.HttpClient)">
+            <summary>
+            Creates a new NAT punch client.
+            </summary>
+            <param name="introducerBaseUri">Base URI of the introducer service (e.g., https://lobby.yarg.in)</param>
+            <param name="httpClient">Optional HttpClient for HTTP requests</param>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.GetPunchServerInfoAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets information about the introducer's NAT punch server.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.Start(System.Int32)">
+            <summary>
+            Starts the UDP socket for NAT punch communication.
+            </summary>
+            <param name="localPort">Local port to bind to (0 = auto)</param>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.RegisterAsHostAsync(System.Guid,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Registers this client as a host for NAT punch coordination.
+            Call this after creating a lobby to allow clients to punch through.
+            </summary>
+            <param name="lobbyId">The lobby ID</param>
+            <param name="gamePort">The game server port (for informational purposes - the punch uses the client's UDP port)</param>
+            <param name="ct">Cancellation token</param>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.UnregisterAsHostAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Unregisters this host from NAT punch coordination.
+            Call this when closing a lobby.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.InitiatePunchAsync(System.Guid,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Initiates a NAT punch to connect to a lobby.
+            The punch server will coordinate with the host and both sides will attempt to punch through.
+            </summary>
+            <param name="lobbyId">The lobby ID to connect to</param>
+            <param name="clientToken">Optional client identifier</param>
+            <param name="ct">Cancellation token</param>
+            <returns>The punch token if successful, null if failed</returns>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.SendNatIntroduceRequest(System.String,System.Int32,System.String)">
+            <summary>
+            Sends a NAT introduction request directly to the punch server.
+            This is an alternative to HTTP-based initiation for lower latency.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.NatPunchClient.Stop">
+            <summary>
+            Stops the NAT punch client.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Directory.PunchServerInfo">
+            <summary>
+            Information about the introducer's NAT punch server.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.PunchServerInfo.#ctor(System.Boolean,System.String,System.Int32,System.String)">
+            <summary>
+            Information about the introducer's NAT punch server.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Directory.PunchRegisterRequest">
+            <summary>
+            Request to register a host for NAT punch coordination.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.PunchRegisterRequest.#ctor(System.Guid,System.String,System.Int32)">
+            <summary>
+            Request to register a host for NAT punch coordination.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Directory.PunchRequest">
+            <summary>
+            Request to initiate a NAT punch to a lobby.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.PunchRequest.#ctor(System.Guid,System.String,System.Int32,System.String)">
+            <summary>
+            Request to initiate a NAT punch to a lobby.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Directory.PunchResponseDto">
+            <summary>
+            Response from punch initiation.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.PunchResponseDto.#ctor(System.Boolean,System.String,System.String)">
+            <summary>
+            Response from punch initiation.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Directory.PunchInitiationResult">
+            <summary>
+            Result of a punch initiation attempt.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Directory.PunchInitiationResult.#ctor(System.Boolean,System.String,System.String)">
+            <summary>
+            Result of a punch initiation attempt.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Discovery.ServerDiscoveryHandler">
             <summary>
             Handles discovery requests on the server side.
@@ -673,6 +803,12 @@
         <member name="T:YARG.Net.Introducer.LobbyLookupResult">
             <summary>
             Result of a lobby code lookup request.
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Introducer.LobbyLookupResult.IntroducerUrl">
+            <summary>
+            The introducer URL that was used for the successful lookup.
+            Used for NAT punch coordination.
             </summary>
         </member>
         <member name="T:YARG.Net.LocalPlayerIdentity">
@@ -3457,6 +3593,11 @@
             Set LogAction from Unity side to capture logs.
             </summary>
         </member>
+        <member name="P:YARG.Net.Transport.TransportLogger.VerboseLogging">
+            <summary>
+            Enable verbose logging (per-packet logs). Default false for production.
+            </summary>
+        </member>
         <member name="P:YARG.Net.Transport.TransportLogger.LogAction">
             <summary>
             Set this delegate from Unity to capture transport-layer logs.
@@ -3467,9 +3608,16 @@
             Log a message. Goes to LogAction if set, otherwise Console.WriteLine.
             </summary>
         </member>
+        <member name="M:YARG.Net.Transport.TransportLogger.LogVerbose(System.String)">
+            <summary>
+            Log a verbose message (only if VerboseLogging is enabled).
+            Use for per-packet and high-frequency logs.
+            </summary>
+        </member>
         <member name="T:YARG.Net.Transport.LiteNetLibTransport">
             <summary>
             LiteNetLib-backed implementation of <see cref="T:YARG.Net.Transport.INetTransport"/> for production networking.
+            Also implements INatPunchListener for NAT hole punching coordination.
             </summary>
         </member>
         <member name="E:YARG.Net.Transport.LiteNetLibTransport.OnUnconnectedMessage">
@@ -3484,10 +3632,30 @@
             Parameters: connection, latencyMs
             </summary>
         </member>
+        <member name="E:YARG.Net.Transport.LiteNetLibTransport.OnNatPunchSuccess">
+            <summary>
+            Fired when NAT punch succeeds on this transport.
+            Parameters: targetEndPoint, addressType, token
+            </summary>
+        </member>
+        <member name="P:YARG.Net.Transport.LiteNetLibTransport.LocalPort">
+            <summary>
+            Gets the local port this transport is bound to.
+            </summary>
+        </member>
         <member name="P:YARG.Net.Transport.LiteNetLibTransport.NetManager">
             <summary>
             Gets the underlying NetManager for advanced operations (discovery, etc).
             </summary>
+        </member>
+        <member name="M:YARG.Net.Transport.LiteNetLibTransport.SendNatIntroduceRequest(System.String,System.Int32,System.String)">
+            <summary>
+            Sends a NAT introduction request to a punch server.
+            Use this to initiate NAT punch-through to a host.
+            </summary>
+            <param name="punchServerHost">The hostname or IP of the punch server</param>
+            <param name="punchServerPort">The UDP port of the punch server</param>
+            <param name="token">The punch token (identifying the session)</param>
         </member>
         <member name="T:YARG.Net.Transport.NullTransport">
             <summary>
@@ -3692,6 +3860,12 @@
             Client for UPnP (Universal Plug and Play) port mapping operations.
             Enables automatic port forwarding on supported routers.
             </summary>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.SetLogger(System.Action{System.String})">
+            <summary>
+            Sets a logger action for UPnP discovery diagnostics.
+            </summary>
+            <param name="logger">Action that receives log messages.</param>
         </member>
         <member name="P:YARG.Net.Utilities.UPnP.UPnPClient.IsAvailable">
             <summary>

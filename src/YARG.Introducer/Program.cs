@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Net;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,12 @@ internal static class Program
     private static readonly ConcurrentDictionary<Guid, LobbyRecord> Lobbies = new();
     private static readonly ConcurrentDictionary<string, Guid> LobbyCodes = new(); // code -> lobbyId
     private static readonly ConcurrentDictionary<Guid, string> LobbyIdToCodes = new(); // lobbyId -> code
+    
+    // NAT punch server for coordinating hole punching
+    private static NatPunchServer? _punchServer;
+    
+    // Default UDP port for NAT punch coordination
+    private const int DefaultPunchPort = 9051;
 
     // Lobbies are considered stale if not updated within this time
     private static readonly TimeSpan LobbyTtl = TimeSpan.FromSeconds(30);
@@ -34,9 +41,36 @@ internal static class Program
 
         var app = builder.Build();
         app.UseCors();
+        
+        // Initialize NAT punch server
+        var punchPort = int.TryParse(Environment.GetEnvironmentVariable("PUNCH_PORT"), out var p) ? p : DefaultPunchPort;
+        try
+        {
+            _punchServer = new NatPunchServer(punchPort);
+            _punchServer.Start();
+            Console.WriteLine($"[Introducer] NAT punch server started on UDP port {punchPort}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Introducer] WARNING: Failed to start NAT punch server: {ex.Message}");
+            Console.WriteLine("[Introducer] NAT punch-through will not be available");
+        }
+        
+        // Graceful shutdown
+        app.Lifetime.ApplicationStopping.Register(() =>
+        {
+            Console.WriteLine("[Introducer] Shutting down NAT punch server...");
+            _punchServer?.Dispose();
+        });
 
-        // Health check
-        app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTimeOffset.UtcNow }));
+        // Health check - enhanced with punch server status
+        app.MapGet("/health", () => Results.Ok(new 
+        { 
+            status = "healthy", 
+            timestamp = DateTimeOffset.UtcNow,
+            punchServerRunning = _punchServer?.IsRunning ?? false,
+            punchServerPort = _punchServer?.Port ?? 0
+        }));
 
         // GET /api/lobbies - List all active lobbies
         app.MapGet("/api/lobbies", () =>
@@ -198,6 +232,172 @@ internal static class Program
             return Results.NotFound(new { error = "Code not found" });
         });
 
+        // ========== NAT PUNCH ENDPOINTS ==========
+        
+        // GET /api/punch/info - Get NAT punch server info
+        app.MapGet("/api/punch/info", (HttpContext context) =>
+        {
+            if (_punchServer == null || !_punchServer.IsRunning)
+            {
+                return Results.Ok(new PunchInfoResponse(
+                    Available: false,
+                    Address: null,
+                    Port: 0,
+                    Message: "NAT punch server not available"
+                ));
+            }
+            
+            // Return the server's public address for clients to connect to
+            // In production, this should be the public IP/hostname of the introducer
+            var serverHost = context.Request.Host.Host;
+            if (serverHost == "localhost" || serverHost == "127.0.0.1")
+            {
+                // Try to get actual LAN IP for local testing
+                serverHost = GetServerPublicAddress() ?? serverHost;
+            }
+            
+            return Results.Ok(new PunchInfoResponse(
+                Available: true,
+                Address: serverHost,
+                Port: _punchServer.Port,
+                Message: "NAT punch server ready"
+            ));
+        });
+        
+        // POST /api/punch/register - Register a host for NAT punch coordination
+        app.MapPost("/api/punch/register", IResult (HttpContext context, PunchRegisterRequest request) =>
+        {
+            if (_punchServer == null || !_punchServer.IsRunning)
+            {
+                return Results.StatusCode(503); // Service Unavailable
+            }
+            
+            if (request.LobbyId == Guid.Empty)
+            {
+                return Results.BadRequest(new { error = "LobbyId is required" });
+            }
+            
+            // Get client's external IP from request
+            var externalIp = GetClientIpAddress(context);
+            var externalEndpoint = new IPEndPoint(IPAddress.Parse(externalIp), request.ExternalPort);
+            
+            // Parse internal endpoint
+            if (!IPEndPoint.TryParse(request.InternalEndpoint, out var internalEndpoint))
+            {
+                return Results.BadRequest(new { error = "Invalid internal endpoint format" });
+            }
+            
+            var lobbyIdStr = request.LobbyId.ToString();
+            _punchServer.RegisterHost(lobbyIdStr, internalEndpoint, externalEndpoint);
+            
+            Console.WriteLine($"[Introducer] Host registered for punch: lobby={lobbyIdStr}, internal={internalEndpoint}, external={externalEndpoint}");
+            
+            return Results.Ok(new { registered = true, lobbyId = request.LobbyId });
+        });
+        
+        // POST /api/punch/request - Client requests NAT punch to a lobby
+        app.MapPost("/api/punch/request", IResult (HttpContext context, PunchRequest request) =>
+        {
+            if (_punchServer == null || !_punchServer.IsRunning)
+            {
+                return Results.StatusCode(503); // Service Unavailable
+            }
+            
+            if (request.LobbyId == Guid.Empty)
+            {
+                return Results.BadRequest(new { error = "LobbyId is required" });
+            }
+            
+            // Get client's external IP from request
+            var externalIp = GetClientIpAddress(context);
+            var clientExternalEndpoint = new IPEndPoint(IPAddress.Parse(externalIp), request.ClientPort);
+            
+            // Parse client's internal endpoint
+            if (!IPEndPoint.TryParse(request.ClientInternalEndpoint, out var clientInternalEndpoint))
+            {
+                return Results.BadRequest(new { error = "Invalid client internal endpoint format" });
+            }
+            
+            var lobbyIdStr = request.LobbyId.ToString();
+            var clientToken = request.ClientToken ?? Guid.NewGuid().ToString("N");
+            
+            var result = _punchServer.RequestPunch(lobbyIdStr, clientInternalEndpoint, clientExternalEndpoint, clientToken);
+            
+            if (!result.Success)
+            {
+                Console.WriteLine($"[Introducer] Punch request failed for lobby {lobbyIdStr}: {result.Message}");
+                return Results.NotFound(new { error = result.Message });
+            }
+            
+            Console.WriteLine($"[Introducer] Punch initiated for lobby {lobbyIdStr}, token={result.PunchToken}");
+            
+            return Results.Ok(new PunchResponse(
+                Success: true,
+                PunchToken: result.PunchToken,
+                Message: "Punch initiated - both sides should now send UDP packets"
+            ));
+        });
+        
+        // DELETE /api/punch/register/{lobbyId} - Unregister a host
+        app.MapDelete("/api/punch/register/{lobbyId:guid}", (Guid lobbyId) =>
+        {
+            if (_punchServer == null)
+            {
+                return Results.Ok(new { unregistered = false });
+            }
+            
+            _punchServer.UnregisterHost(lobbyId.ToString());
+            return Results.Ok(new { unregistered = true });
+        });
+        
+        // GET /api/punch/udp-status - Get UDP diagnostic information
+        app.MapGet("/api/punch/udp-status", (HttpContext context) =>
+        {
+            var clientIp = GetClientIpAddress(context);
+            var status = new
+            {
+                clientExternalIp = clientIp,
+                punchServerRunning = _punchServer?.IsRunning ?? false,
+                punchServerPort = _punchServer?.Port ?? 0,
+                timestamp = DateTimeOffset.UtcNow
+            };
+            
+            Console.WriteLine($"[Introducer] UDP status check from {clientIp}");
+            
+            return Results.Ok(status);
+        });
+        
+        // POST /api/punch/send-test - Send a test UDP packet to specified endpoint (for debugging)
+        app.MapPost("/api/punch/send-test", async (HttpContext context, UdpTestRequest request) =>
+        {
+            if (_punchServer == null || !_punchServer.IsRunning)
+            {
+                return Results.StatusCode(503);
+            }
+            
+            var clientIp = GetClientIpAddress(context);
+            Console.WriteLine($"[Introducer] UDP test requested from {clientIp}: target={request.TargetIp}:{request.TargetPort}");
+            
+            try
+            {
+                // Send a test UDP packet to the client's endpoint
+                using var udpClient = new System.Net.Sockets.UdpClient();
+                var message = System.Text.Encoding.UTF8.GetBytes($"YARG-UDP-TEST:{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}");
+                var targetEndpoint = new System.Net.IPEndPoint(System.Net.IPAddress.Parse(request.TargetIp), request.TargetPort);
+                
+                int sentBytes = await udpClient.SendAsync(message, message.Length, targetEndpoint);
+                
+                Console.WriteLine($"[Introducer] Sent {sentBytes} bytes to {targetEndpoint}");
+                
+                return Results.Ok(new { sent = true, bytes = sentBytes, target = targetEndpoint.ToString() });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Introducer] UDP test failed: {ex.Message}");
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        });
+
         Console.WriteLine("YARG Introducer Service starting...");
         Console.WriteLine("Endpoints:");
         Console.WriteLine("  GET    /api/lobbies             - List active lobbies");
@@ -206,6 +406,9 @@ internal static class Program
         Console.WriteLine("  POST   /api/lobbies/code        - Generate code for lobby");
         Console.WriteLine("  GET    /api/lobbies/code/{code} - Look up lobby by code");
         Console.WriteLine("  DELETE /api/lobbies/code/{code} - Release code");
+        Console.WriteLine("  GET    /api/punch/info          - Get NAT punch server info");
+        Console.WriteLine("  POST   /api/punch/register      - Register host for punch");
+        Console.WriteLine("  POST   /api/punch/request       - Request punch to lobby");
         Console.WriteLine();
 
         app.Run();
@@ -296,6 +499,27 @@ internal static class Program
 
         return "0.0.0.0";
     }
+    
+    private static string? GetServerPublicAddress()
+    {
+        try
+        {
+            // Try to get the server's LAN IP for local testing
+            var host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+        }
+        catch
+        {
+            // Ignore errors
+        }
+        return null;
+    }
 
     private sealed class LobbyRecord
     {
@@ -333,3 +557,12 @@ internal static class Program
 // Request/Response types for lobby code endpoints
 public record LobbyCodeRequest(Guid LobbyId);
 public record LobbyCodeResponse(string Code, Guid LobbyId);
+
+// Request/Response types for NAT punch endpoints
+public record PunchInfoResponse(bool Available, string? Address, int Port, string Message);
+public record PunchRegisterRequest(Guid LobbyId, string InternalEndpoint, int ExternalPort);
+public record PunchRequest(Guid LobbyId, string ClientInternalEndpoint, int ClientPort, string? ClientToken = null);
+public record PunchResponse(bool Success, string? PunchToken, string Message);
+
+// UDP test endpoint request
+public record UdpTestRequest(string TargetIp, int TargetPort);

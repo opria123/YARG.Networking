@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -16,6 +17,16 @@ internal static class UPnPDiscovery
 {
     private const string SsdpMulticastAddress = "239.255.255.250";
     private const int SsdpPort = 1900;
+
+    // Simple logger action that can be set externally
+    public static Action<string>? Logger { get; set; }
+    
+    private static void Log(string message)
+    {
+        Logger?.Invoke(message);
+        // Also write to debug output for development
+        Debug.WriteLine($"[UPnP] {message}");
+    }
 
     // UPnP search targets for Internet Gateway Device
     private static readonly string[] SearchTargets =
@@ -40,15 +51,27 @@ internal static class UPnPDiscovery
         // Get the local LAN address to bind to the correct interface
         // This is critical on systems with multiple network adapters (Docker, WSL, VPN, etc.)
         var localAddress = GetLocalLanAddress() ?? IPAddress.Any;
-        Console.WriteLine($"[UPnP] Binding to local address: {localAddress}");
+        Log($"Binding to local address: {localAddress}");
 
         using var udpClient = new UdpClient();
         udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        udpClient.Client.Bind(new IPEndPoint(localAddress, 0));
+        
+        // Also enable broadcast
+        udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+        
+        try
+        {
+            udpClient.Client.Bind(new IPEndPoint(localAddress, 0));
+        }
+        catch (Exception ex)
+        {
+            Log($"Failed to bind to {localAddress}, falling back to Any: {ex.Message}");
+            udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, 0));
+        }
 
         var multicastEndpoint = new IPEndPoint(IPAddress.Parse(SsdpMulticastAddress), SsdpPort);
         
-        Console.WriteLine($"[UPnP] Starting SSDP discovery (timeout: {timeout.TotalSeconds}s)");
+        Log($"Starting SSDP discovery (timeout: {timeout.TotalSeconds}s)");
 
         // Send M-SEARCH requests for each target
         int sentCount = 0;
@@ -64,11 +87,11 @@ internal static class UPnPDiscovery
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[UPnP] Failed to send M-SEARCH for {target}: {ex.Message}");
+                Log($"Failed to send M-SEARCH for {target}: {ex.Message}");
             }
         }
         
-        Console.WriteLine($"[UPnP] Sent {sentCount} M-SEARCH requests to {SsdpMulticastAddress}:{SsdpPort}");
+        Log($"Sent {sentCount} M-SEARCH requests to {SsdpMulticastAddress}:{SsdpPort}");
 
         // Collect responses
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -88,22 +111,22 @@ internal static class UPnPDiscovery
                     var result = await receiveTask;
                     var response = Encoding.ASCII.GetString(result.Buffer);
                     responses.Add(response);
-                    Console.WriteLine($"[UPnP] Received response from {result.RemoteEndPoint}");
+                    Log($"Received SSDP response from {result.RemoteEndPoint}");
 
                     // Try to parse the response immediately
                     var location = ParseLocation(response);
                     if (!string.IsNullOrEmpty(location))
                     {
-                        Console.WriteLine($"[UPnP] Found device at: {location}");
+                        Log($"Found device location: {location}");
                         var device = await TryGetDeviceAsync(location, cts.Token);
                         if (device != null)
                         {
-                            Console.WriteLine($"[UPnP] Successfully parsed device: {device.FriendlyName}");
+                            Log($"Successfully discovered gateway: {device.FriendlyName} (service: {device.ServiceType})");
                             return device;
                         }
                         else
                         {
-                            Console.WriteLine($"[UPnP] Device at {location} is not a compatible gateway");
+                            Log($"Device at {location} is not a compatible gateway (no WANIPConnection service)");
                         }
                     }
                 }
@@ -112,7 +135,7 @@ internal static class UPnPDiscovery
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             // Timeout - continue to try parsing collected responses
-            Console.WriteLine($"[UPnP] Discovery timeout reached. Received {responses.Count} responses.");
+            Log($"Discovery timeout reached. Received {responses.Count} SSDP responses total.");
         }
 
         // Try any remaining responses
@@ -126,18 +149,25 @@ internal static class UPnPDiscovery
                     var device = await TryGetDeviceAsync(location, cancellationToken);
                     if (device != null)
                     {
-                        Console.WriteLine($"[UPnP] Found compatible device: {device.FriendlyName}");
+                        Log($"Found compatible gateway in remaining responses: {device.FriendlyName}");
                         return device;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[UPnP] Error checking device at {location}: {ex.Message}");
+                    Log($"Error checking device at {location}: {ex.Message}");
                 }
             }
         }
 
-        Console.WriteLine($"[UPnP] No compatible UPnP gateway found after checking {responses.Count} responses");
+        if (responses.Count == 0)
+        {
+            Log("No SSDP responses received. Possible causes: UPnP disabled on router, firewall blocking UDP port 1900, or router doesn't support UPnP.");
+        }
+        else
+        {
+            Log($"No compatible UPnP gateway found after checking {responses.Count} responses. Router may not support WANIPConnection.");
+        }
         return null;
     }
 
@@ -178,6 +208,21 @@ internal static class UPnPDiscovery
         // Parse base URL from location
         var locationUri = new Uri(locationUrl);
         var baseUrl = $"{locationUri.Scheme}://{locationUri.Host}:{locationUri.Port}";
+
+        // Log available services for debugging
+        var allServices = Regex.Matches(xml, @"<serviceType>([^<]+)</serviceType>", RegexOptions.IgnoreCase);
+        if (allServices.Count > 0)
+        {
+            Log($"Services found in device XML ({allServices.Count} total):");
+            foreach (Match match in allServices)
+            {
+                Log($"  - {match.Groups[1].Value}");
+            }
+        }
+        else
+        {
+            Log("No <serviceType> elements found in device XML");
+        }
 
         // Look for WANIPConnection or WANPPPConnection service
         var serviceTypes = new[]
