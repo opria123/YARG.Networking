@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -28,6 +29,12 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
     private bool _isRegistered;
     private bool _isPeerConnected;
     private bool _disposed;
+    
+    /// <summary>
+    /// Logger callback for external logging (e.g., Unity Debug.Log).
+    /// If not set, logs go to Console.
+    /// </summary>
+    public static Action<string>? Logger { get; set; }
     
     // Relay opcodes (must match server)
     private const byte OPCODE_REGISTER = 1;
@@ -106,14 +113,37 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         
         if (!_client.Start())
         {
+            Log($"Failed to start relay client NetManager");
             OnError?.Invoke("Failed to start relay client");
             return false;
         }
         
-        Console.WriteLine($"[LiteNetRelayClient] Connecting to relay at {_relayAddress}:{_relayPort}...");
+        Log($"Connecting to relay at {_relayAddress}:{_relayPort} (session={_sessionId}, isHost={_isHost})...");
         
-        // Connect to relay server
-        _relayPeer = _client.Connect(_relayAddress, _relayPort, string.Empty);
+        // Resolve DNS explicitly to get the actual IP
+        IPAddress? resolvedIp = null;
+        try
+        {
+            var addresses = await Dns.GetHostAddressesAsync(_relayAddress);
+            resolvedIp = addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork);
+            if (resolvedIp != null)
+            {
+                Log($"Resolved {_relayAddress} to IPv4: {resolvedIp}");
+            }
+            else
+            {
+                Log($"WARNING: No IPv4 address found for {_relayAddress}, addresses: {string.Join(", ", addresses.Select(a => a.ToString()))}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"DNS resolution failed: {ex.Message}");
+        }
+        
+        // Connect to relay server using resolved IP if available, else hostname
+        var connectAddress = resolvedIp?.ToString() ?? _relayAddress;
+        Log($"Initiating LiteNetLib connection to {connectAddress}:{_relayPort}...");
+        _relayPeer = _client.Connect(connectAddress, _relayPort, string.Empty);
         
         if (_relayPeer == null)
         {
@@ -134,11 +164,12 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         
         if (!IsConnectedToRelay)
         {
+            Log("Connection to relay timed out after " + timeoutMs + "ms");
             OnError?.Invoke("Connection to relay timed out");
             return false;
         }
         
-        Console.WriteLine($"[LiteNetRelayClient] Connected to relay, registering as {(_isHost ? "host" : "client")}...");
+        Log($"Connected to relay, registering as {(_isHost ? "host" : "client")}...");
         
         // Send registration
         var writer = new NetDataWriter();
@@ -156,11 +187,12 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         
         if (!_isRegistered)
         {
+            Log("Registration with relay timed out after 5000ms");
             OnError?.Invoke("Registration with relay timed out");
             return false;
         }
         
-        Console.WriteLine($"[LiteNetRelayClient] Registered with relay as {(_isHost ? "host" : "client")} for session {_sessionId}");
+        Log($"Registered with relay as {(_isHost ? "host" : "client")} for session {_sessionId}");
         
         return true;
     }
@@ -218,7 +250,7 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[LiteNetRelayClient] Poll error: {ex.Message}");
+                Log($"Poll error: {ex.Message}");
             }
         }
     }
@@ -233,12 +265,12 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
     
     public void OnPeerConnected(NetPeer peer)
     {
-        Console.WriteLine($"[LiteNetRelayClient] Connected to relay server");
+        Log($"Connected to relay server (peer {peer.Id})");
     }
     
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        Console.WriteLine($"[LiteNetRelayClient] Disconnected from relay: {disconnectInfo.Reason}");
+        Log($"Disconnected from relay: {disconnectInfo.Reason}");
         _isRegistered = false;
         _isPeerConnected = false;
         OnDisconnected?.Invoke(disconnectInfo.Reason.ToString());
@@ -246,7 +278,7 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
     
     public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
     {
-        Console.WriteLine($"[LiteNetRelayClient] Network error: {socketError}");
+        Log($"Network error from {endPoint}: {socketError}");
         OnError?.Invoke($"Network error: {socketError}");
     }
     
@@ -283,7 +315,7 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
                 break;
                 
             default:
-                Console.WriteLine($"[LiteNetRelayClient] Unknown opcode: {opcode}");
+                Log($"Unknown opcode: {opcode}");
                 break;
         }
         
@@ -313,7 +345,7 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         if (sessionId == _sessionId)
         {
             _isRegistered = true;
-            Console.WriteLine($"[LiteNetRelayClient] Registration confirmed for session {sessionId}");
+            Log($"Registration confirmed for session {sessionId}");
             OnRegistered?.Invoke();
         }
     }
@@ -330,7 +362,7 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         if (sessionId == _sessionId)
         {
             _isPeerConnected = true;
-            Console.WriteLine($"[LiteNetRelayClient] Peer connected via relay for session {sessionId}");
+            Log($"Peer connected via relay for session {sessionId}");
             OnRelayPeerConnected?.Invoke();
         }
     }
@@ -347,7 +379,7 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         if (sessionId == _sessionId)
         {
             _isPeerConnected = false;
-            Console.WriteLine($"[LiteNetRelayClient] Peer disconnected from relay session {sessionId}");
+            Log($"Peer disconnected from relay session {sessionId}");
             OnRelayPeerDisconnected?.Invoke();
         }
     }
@@ -372,8 +404,17 @@ public sealed class LiteNetRelayClient : INetEventListener, IDisposable
         reader.GetBytes(sessionIdBytes, 16);
         var message = reader.GetString();
         
-        Console.WriteLine($"[LiteNetRelayClient] Error from relay: {message}");
+        Log($"Error from relay: {message}");
         OnError?.Invoke(message);
+    }
+    
+    private void Log(string message)
+    {
+        var logMessage = $"[LiteNetRelayClient] {message}";
+        if (Logger != null)
+            Logger(logMessage);
+        else
+            Console.WriteLine(logMessage);
     }
     
     public void Dispose()
