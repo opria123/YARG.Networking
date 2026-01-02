@@ -60,3 +60,4 @@ F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Debug\
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Debug\net8.0\YARG.Introducer.pdb
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Debug\net8.0\YARG.Introducer.genruntimeconfig.cache
 F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\obj\Debug\net8.0\ref\YARG.Introducer.dll
+F:\projects\YARG-development\YARG\YARG.Networking\src\YARG.Introducer\bin\Debug\net8.0\SharpOpenNat.dll

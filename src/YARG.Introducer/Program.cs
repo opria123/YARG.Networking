@@ -18,8 +18,14 @@ internal static class Program
     // NAT punch server for coordinating hole punching
     private static NatPunchServer? _punchServer;
     
+    // Relay server for when direct connections fail
+    private static RelayServer? _relayServer;
+    
     // Default UDP port for NAT punch coordination
     private const int DefaultPunchPort = 9051;
+    
+    // Default UDP port for relay
+    private const int DefaultRelayPort = 9052;
 
     // Lobbies are considered stale if not updated within this time
     private static readonly TimeSpan LobbyTtl = TimeSpan.FromSeconds(30);
@@ -56,20 +62,38 @@ internal static class Program
             Console.WriteLine("[Introducer] NAT punch-through will not be available");
         }
         
+        // Initialize Relay server
+        var relayPort = int.TryParse(Environment.GetEnvironmentVariable("RELAY_PORT"), out var r) ? r : DefaultRelayPort;
+        try
+        {
+            _relayServer = new RelayServer(relayPort);
+            _relayServer.Start();
+            Console.WriteLine($"[Introducer] Relay server started on UDP port {relayPort}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Introducer] WARNING: Failed to start Relay server: {ex.Message}");
+            Console.WriteLine("[Introducer] Relay connections will not be available");
+        }
+        
         // Graceful shutdown
         app.Lifetime.ApplicationStopping.Register(() =>
         {
-            Console.WriteLine("[Introducer] Shutting down NAT punch server...");
+            Console.WriteLine("[Introducer] Shutting down servers...");
             _punchServer?.Dispose();
+            _relayServer?.Dispose();
         });
 
-        // Health check - enhanced with punch server status
+        // Health check - enhanced with punch and relay server status
         app.MapGet("/health", () => Results.Ok(new 
         { 
             status = "healthy", 
             timestamp = DateTimeOffset.UtcNow,
             punchServerRunning = _punchServer?.IsRunning ?? false,
-            punchServerPort = _punchServer?.Port ?? 0
+            punchServerPort = _punchServer?.Port ?? 0,
+            relayServerRunning = _relayServer?.IsRunning ?? false,
+            relayServerPort = _relayServer?.Port ?? 0,
+            relayActiveSessions = _relayServer?.ActiveSessions ?? 0
         }));
 
         // GET /api/lobbies - List all active lobbies
@@ -397,6 +421,107 @@ internal static class Program
                 return Results.BadRequest(new { error = ex.Message });
             }
         });
+        
+        // ========== RELAY ENDPOINTS ==========
+        
+        // GET /api/relay/info - Get relay server info
+        app.MapGet("/api/relay/info", (HttpContext context) =>
+        {
+            if (_relayServer == null || !_relayServer.IsRunning)
+            {
+                return Results.Ok(new RelayInfoResponse(
+                    Available: false,
+                    Address: null,
+                    Port: 0,
+                    Message: "Relay server not available"
+                ));
+            }
+            
+            var serverHost = context.Request.Host.Host;
+            if (serverHost == "localhost" || serverHost == "127.0.0.1")
+            {
+                serverHost = GetServerPublicAddress() ?? serverHost;
+            }
+            
+            return Results.Ok(new RelayInfoResponse(
+                Available: true,
+                Address: serverHost,
+                Port: _relayServer.Port,
+                Message: "Relay server ready"
+            ));
+        });
+        
+        // POST /api/relay/allocate - Allocate a relay session for a lobby
+        app.MapPost("/api/relay/allocate", (HttpContext context, RelayAllocateRequest request) =>
+        {
+            if (_relayServer == null || !_relayServer.IsRunning)
+            {
+                return Results.StatusCode(503);
+            }
+            
+            if (request.LobbyId == Guid.Empty)
+            {
+                return Results.BadRequest(new { error = "LobbyId is required" });
+            }
+            
+            var clientIp = GetClientIpAddress(context);
+            var result = _relayServer.AllocateSession(request.LobbyId, clientIp);
+            
+            if (!result.Success)
+            {
+                return Results.BadRequest(new { error = result.Message });
+            }
+            
+            // Return the relay server's public address
+            var serverHost = context.Request.Host.Host;
+            if (serverHost == "localhost" || serverHost == "127.0.0.1")
+            {
+                serverHost = GetServerPublicAddress() ?? serverHost;
+            }
+            
+            Console.WriteLine($"[Introducer] Relay session allocated: {result.SessionId} for lobby {request.LobbyId}");
+            
+            return Results.Ok(new RelayAllocateResponse(
+                Success: true,
+                SessionId: result.SessionId,
+                RelayAddress: serverHost,
+                RelayPort: result.RelayPort,
+                Message: result.Message
+            ));
+        });
+        
+        // DELETE /api/relay/{sessionId} - Release a relay session
+        app.MapDelete("/api/relay/{sessionId:guid}", (Guid sessionId) =>
+        {
+            if (_relayServer == null)
+            {
+                return Results.Ok(new { released = false });
+            }
+            
+            _relayServer.ReleaseSession(sessionId);
+            return Results.Ok(new { released = true });
+        });
+        
+        // GET /api/relay/stats - Get relay server statistics
+        app.MapGet("/api/relay/stats", () =>
+        {
+            if (_relayServer == null)
+            {
+                return Results.Ok(new { available = false });
+            }
+            
+            var stats = _relayServer.GetStats();
+            return Results.Ok(new
+            {
+                available = true,
+                isRunning = stats.IsRunning,
+                port = stats.Port,
+                activeSessions = stats.ActiveSessions,
+                totalSessionsCreated = stats.TotalSessionsCreated,
+                packetsRelayed = stats.PacketsRelayed,
+                bytesRelayed = stats.BytesRelayed
+            });
+        });
 
         Console.WriteLine("YARG Introducer Service starting...");
         Console.WriteLine("Endpoints:");
@@ -409,6 +534,10 @@ internal static class Program
         Console.WriteLine("  GET    /api/punch/info          - Get NAT punch server info");
         Console.WriteLine("  POST   /api/punch/register      - Register host for punch");
         Console.WriteLine("  POST   /api/punch/request       - Request punch to lobby");
+        Console.WriteLine("  GET    /api/relay/info          - Get relay server info");
+        Console.WriteLine("  POST   /api/relay/allocate      - Allocate relay session");
+        Console.WriteLine("  DELETE /api/relay/{sessionId}   - Release relay session");
+        Console.WriteLine("  GET    /api/relay/stats         - Get relay statistics");
         Console.WriteLine();
 
         app.Run();
@@ -566,3 +695,8 @@ public record PunchResponse(bool Success, string? PunchToken, string Message);
 
 // UDP test endpoint request
 public record UdpTestRequest(string TargetIp, int TargetPort);
+
+// Request/Response types for relay endpoints
+public record RelayInfoResponse(bool Available, string? Address, int Port, string Message);
+public record RelayAllocateRequest(Guid LobbyId);
+public record RelayAllocateResponse(bool Success, Guid SessionId, string RelayAddress, int RelayPort, string Message);

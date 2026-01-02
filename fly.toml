@@ -22,7 +22,7 @@ primary_region = 'iad'
   auto_start_machines = true
   min_machines_running = 1
 
-# UDP service for NAT punch coordination
+# UDP service for NAT punch coordination (port 9051)
 [[services]]
   protocol = 'udp'
   internal_port = 9051
@@ -31,6 +31,16 @@ primary_region = 'iad'
 
   [[services.ports]]
     port = 9051
+
+# UDP service for Relay (port 9052)
+[[services]]
+  protocol = 'udp'
+  internal_port = 9052
+  auto_stop_machines = false
+  auto_start_machines = true
+
+  [[services.ports]]
+    port = 9052
 
 [[vm]]
   memory = '1gb'

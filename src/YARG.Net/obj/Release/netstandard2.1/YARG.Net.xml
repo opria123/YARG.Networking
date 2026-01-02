@@ -2238,6 +2238,128 @@
             Parses a unison bonus award packet (legacy overload, ignores bandId).
             </summary>
         </member>
+        <member name="T:YARG.Net.Relay.RelayClient">
+            <summary>
+            Relay client that communicates through a relay server when direct P2P is not possible.
+            Handles the relay protocol for both hosts and clients.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnDataReceived">
+            <summary>Event fired when data is received from the peer.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnPeerConnected">
+            <summary>Event fired when the other peer connects.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnPeerDisconnected">
+            <summary>Event fired when the other peer disconnects.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnRegistered">
+            <summary>Event fired when registration with the relay succeeds.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayClient.OnError">
+            <summary>Event fired on errors.</summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayClient.Start">
+            <summary>
+            Starts the relay client and registers with the server.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayClient.Send(System.Byte[])">
+            <summary>
+            Sends data through the relay to the peer.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayClient.Disconnect">
+            <summary>
+            Sends a disconnect notification and stops the client.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayPacketType">
+            <summary>
+            Types of relay control packets. Must match server-side enum.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayConnectionManager">
+            <summary>
+            Manages relay connections for when direct P2P is not possible.
+            This is the main entry point for the relay system.
+            </summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnDataReceived">
+            <summary>Event fired when data is received from the peer.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnConnected">
+            <summary>Event fired when connected via relay.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnDisconnected">
+            <summary>Event fired when disconnected.</summary>
+        </member>
+        <member name="E:YARG.Net.Relay.RelayConnectionManager.OnError">
+            <summary>Event fired on errors.</summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.IsRelayAvailableAsync(System.Threading.CancellationToken)">
+            <summary>
+            Checks if the relay server is available.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.StartHostRelayAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Allocates a relay session and starts the host side of the connection.
+            Call this when hosting a lobby that needs relay.
+            </summary>
+            <param name="lobbyId">The lobby ID to create a relay for.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>The relay session info, or null if allocation failed.</returns>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.ConnectViaRelayAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Connects to a lobby via relay as a client.
+            </summary>
+            <param name="lobbyId">The lobby ID to connect to.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>True if connection initiated successfully.</returns>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.Send(System.Byte[])">
+            <summary>
+            Sends data through the relay to the peer.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayConnectionManager.DisconnectAsync">
+            <summary>
+            Disconnects from the relay.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayHttpClient">
+            <summary>
+            HTTP client for interacting with the relay server's REST API.
+            Handles session allocation and management.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayHttpClient.GetRelayInfoAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets information about the relay server.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayHttpClient.AllocateSessionAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Allocates a relay session for a lobby.
+            </summary>
+        </member>
+        <member name="M:YARG.Net.Relay.RelayHttpClient.ReleaseSessionAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Releases a relay session.
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayInfo">
+            <summary>
+            Relay server info returned by /api/relay/info
+            </summary>
+        </member>
+        <member name="T:YARG.Net.Relay.RelayAllocation">
+            <summary>
+            Relay session allocation result from /api/relay/allocate
+            </summary>
+        </member>
         <member name="T:YARG.Net.Runtime.ClientNetworkingBootstrapper">
             <summary>
             Helper for wiring up the default client runtime, packet dispatcher, and session-aware helpers.
@@ -3914,6 +4036,13 @@
             </summary>
             <param name="cancellationToken">Cancellation token.</param>
             <returns>The external IP address, or null if unavailable.</returns>
+        </member>
+        <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.GetAllMappingsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Lists all port mappings on the gateway device.
+            </summary>
+            <param name="cancellationToken">Cancellation token.</param>
+            <returns>List of all port mappings, or empty list on error.</returns>
         </member>
         <member name="M:YARG.Net.Utilities.UPnP.UPnPClient.GetPortMappingAsync(System.Int32,YARG.Net.Utilities.UPnP.PortMappingProtocol,System.Threading.CancellationToken)">
             <summary>
